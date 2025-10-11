@@ -1,14 +1,14 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define SCREEN_HEIGHT (32 + 1)
-#define SCREEN_WIDTH (32 + 1)
+#define SCREEN_HEIGHT (16 + 1)
+#define SCREEN_WIDTH (16 + 1)
 #define SCREEN_SIZE ((SCREEN_WIDTH) * (SCREEN_HEIGHT))
 
 #define CHR_WIDTH 8
 #define CHR_HEIGHT 8
 
-#define CHR_SCALE 2
+#define CHR_SCALE 3
 
 #define WINDOW_WIDTH (CHR_WIDTH * SCREEN_WIDTH)
 #define WINDOW_HEIGHT (CHR_HEIGHT * SCREEN_HEIGHT)

@@ -6,8 +6,8 @@
 #include <stdbool.h>
 
 
-#define MAP_WIDTH (SCREEN_WIDTH * 8)
-#define MAP_HEIGHT (SCREEN_HEIGHT * 8)
+#define MAP_WIDTH (SCREEN_WIDTH * 2)
+#define MAP_HEIGHT (SCREEN_HEIGHT * 2)
 
 
 typedef struct {

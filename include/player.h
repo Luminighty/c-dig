@@ -3,25 +3,27 @@
 
 
 #include "display.h"
+#include "material.h"
 #include "math.h"
 #include "tile.h"
 #include "utils.h"
+#include "work.h"
 #include <raylib.h>
 #include <stdbool.h>
 
 
 typedef struct {
+	Work work;
 	Direction target;
-	int progress;
 	int speed;
 	Tile tile;
 } Dig;
 
 
 typedef struct {
+	Work work;
+	WorkUnit work_weight;
 	int speed;
-	int progress;
-	int weight;
 	int jump;
 	bool on_ground;
 } Movement;
@@ -29,9 +31,10 @@ typedef struct {
 
 typedef struct {
 	Vec2 position;
+	Glyph glyph;
 	Movement movement;
 	Dig dig;
-	Glyph glyph;
+	MaterialComposition bag;
 } Player;
 
 

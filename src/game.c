@@ -4,6 +4,7 @@
 #include "input.h"
 #include "map.h"
 #include "player.h"
+#include "worldgen.h"
 #include <raylib.h>
 #include <stdbool.h>
 
@@ -12,6 +13,7 @@ RenderTexture2D render_target;
 
 void game_init() {
 	game.map = map_create();
+	worldgen_run(game.map, 0);
 	game.player = player_create(MAP_WIDTH / 2, MAP_HEIGHT / 2);
 	render_target = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
 }
