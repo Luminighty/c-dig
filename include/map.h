@@ -21,8 +21,8 @@ void map_destroy(Map* map);
 void map_render(Map* map);
 void map_dig(Map* map, int x, int y);
 
-#define map_get(map, x, y) ((map)->tiles[(y)][(x)])
-#define map_set(map, x, y, tile) (map)->tiles[(y)][(x)] = (tile)
+#define map_get(map, x, y) ((map)->tiles[(int)(y)][(int)(x)])
+#define map_set(map, x, y, tile) (map)->tiles[(int)(y)][(int)(x)] = (tile)
 
 
 #endif // MAP_H

@@ -1,4 +1,5 @@
 #include "game.h"
+#include "collision.h"
 #include "config.h"
 #include "display.h"
 #include "input.h"
@@ -12,14 +13,17 @@ Game game = {0};
 RenderTexture2D render_target;
 
 void game_init() {
+	physics_init();
 	game.map = map_create();
 	worldgen_run(game.map, 0);
 	game.player = player_create(MAP_WIDTH / 2, MAP_HEIGHT / 2);
 	render_target = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+	collider_create(1, (Vec2){.x = 0, .y = 30}, (Vec2){.x = 100, .y = 1});
 }
 
 void game_destroy() {
 	map_destroy(game.map);
+	physics_deinit();
 }
 
 void game_update() {

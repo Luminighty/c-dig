@@ -2,9 +2,11 @@
 #define PLAYER_H
 
 
+#include "collision.h"
 #include "display.h"
+#include "entity.h"
 #include "material.h"
-#include "math.h"
+#include "linalg.h"
 #include "tile.h"
 #include "utils.h"
 #include "work.h"
@@ -21,20 +23,21 @@ typedef struct {
 
 
 typedef struct {
-	Work work;
-	WorkUnit work_weight;
-	int speed;
+	float speed;
 	int jump;
 	bool on_ground;
+	float gravity;
 } Movement;
 
 
 typedef struct {
+	EntityId id;
 	Vec2 position;
 	Glyph glyph;
 	Movement movement;
 	Dig dig;
 	MaterialComposition bag;
+	ColliderId collider;
 } Player;
 
 

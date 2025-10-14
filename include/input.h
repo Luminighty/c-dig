@@ -1,7 +1,7 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include "math.h"
+#include "linalg.h"
 #include <stdbool.h>
 
 

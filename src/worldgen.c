@@ -18,6 +18,8 @@
 
 
 static Tile generate_tile(int x, int y) {
+	if (y <= 27)
+		return TILE_AIR;
 	int val = rand() % 100;
 	if (val > 98)
 		return TILE_DIAMOND;

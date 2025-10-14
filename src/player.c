@@ -1,11 +1,13 @@
 #include "player.h"
+#include "collision.h"
 #include "config.h"
 #include "display.h"
+#include "entity.h"
 #include "game.h"
 #include "input.h"
 #include "map.h"
 #include "material.h"
-#include "math.h"
+#include "linalg.h"
 #include "palette.h"
 #include "tile.h"
 #include "utils.h"
@@ -14,75 +16,26 @@
 
 
 Player player_create(int x, int y) {
+	EntityId id = entity_create();
+	ColliderId collider = collider_create(id, (Vec2){.x = x, .y = y}, (Vec2){.x = 2, .y = 2});
 	return (Player){
+		.id = id,
 		.position = {.x = x, .y = y},
-		.movement = {.speed = 100, .work_weight = 1000},
+		.movement = {.speed = 0.1f, .gravity = 0.1f},
 		.glyph = glyph(0x02, PAL_ORANGE, PAL_BLACK),
-		.dig = { .speed = 100 }
+		.dig = { .speed = 100 },
+		.collider = collider,
 	};
-}
-
-
-static inline void move(Player* player, int dx, int dy) {
-	Vec2 new_pos = {.x = player->position.x + dx, .y = player->position.y + dy};
-	Tile target_tile = map_get(game.map, new_pos.x, new_pos.y);
-	if (tile_is_solid(target_tile))
-		return;
-	player->position = new_pos;
-	work_reset(&player->dig.work);
-}
-
-
-static inline void player_gravity(Player* player) {
-	static const int GRAVITY_TICK = 3;
-	if (game.tick % GRAVITY_TICK != 0)
-		return;
-	if (player->movement.jump > 0)
-		return;
-
-	int dy = 1;
-	Tile target_tile = map_get(game.map, player->position.x, player->position.y + dy);
-	if (tile_is_solid(target_tile)) {
-		player->movement.on_ground = true;
-		return;
-	}
-	player->movement.on_ground = false;
-	move(player, 0, dy);
-}
-
-
-static inline void player_jump(Player* player) {
-	if (!input.jump)
-		return;
-	if (!player->movement.on_ground)
-		return;
-	player->movement.on_ground = false;
-	player->movement.jump = 3;
 }
 
 
 static inline void player_movement(Player* player) {
 	Vec2 delta = {
-		.x = input.movement.x,
-		.y = player->movement.jump > 0 ? -1 : 0,
+		.x = input.movement.x * player->movement.speed,
+		.y = player->movement.gravity
 	};
-	bool is_stationary = vec2_is_zero(delta);
-
-	bool is_done = work_full_update(
-		&player->movement.work,
-		!is_stationary,
-		player->movement.work_weight,
-		player->movement.speed
-	);
-	if (!is_done)
-		return;
-
-	if (delta.x)
-		move(player, delta.x, 0);
-	if (delta.y)
-		move(player, 0, delta.y);
-	if (player->movement.jump > 0)
-		player->movement.jump--;
+	ColliderMoveResult result = collider_move(player->collider, delta);
+	player->position = result.resolved_position;
 }
 
 
@@ -123,8 +76,6 @@ static inline void player_dig(Player* player) {
 void player_update(Player* player) {
 	player_movement(player);
 	player_dig(player);
-	player_gravity(player);
-	player_jump(player);
 }
 
 
