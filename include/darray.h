@@ -1,7 +1,7 @@
 #ifndef VEC_H
 #define VEC_H
 
-#include <stdlib.h>
+#include <memory.h>
 
 #define DATypedef(Type, Item) \
 	typedef struct { \

@@ -30,14 +30,23 @@ typedef struct {
 } Movement;
 
 
+typedef enum {
+	PLAYER_SPRITE_SLOT_BODY,
+	PLAYER_SPRITE_SLOT_CLOTH,
+	PLAYER_SPRITE_SLOT_BEARD,
+	PLAYER_SPRITE_SLOT_HAT,
+	PLAYER_SPRITE_SLOT_SIZE,
+} PlayerSpriteSlot;
+
+
 typedef struct {
 	EntityId id;
 	Vec2 position;
-	Glyph glyph;
 	Movement movement;
 	Dig dig;
 	MaterialComposition bag;
 	ColliderId collider;
+	SpriteId sprites[PLAYER_SPRITE_SLOT_SIZE];
 } Player;
 
 

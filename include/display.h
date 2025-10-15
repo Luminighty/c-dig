@@ -1,34 +1,49 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include "config.h"
+#include "assets_registry.h"
+#include "linalg.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 
 #define ZINDEX_SKIP 0
+#define SPRITE_MAX 32
 
 typedef char ZIndex;
-
-typedef struct {
-	char glyph;
-	int fg;
-	int bg;
-} Glyph;
-
-#define glyph(_glyph, _fg, _bg) (Glyph){ .glyph=(_glyph), .fg=(_fg), .bg=(_bg) }
+typedef uint32_t SpriteId;
 
 
 typedef struct {
-	Glyph glyphs[SCREEN_HEIGHT][SCREEN_WIDTH];
-	ZIndex z_buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
-} Display;
+	SpriteId id;
+	TextureId texture;
+	Vec2 position;
+	Vec2 offset;
+	bool enabled;
+	bool alive;
+} Sprite;
+
+
+typedef struct {
+	Sprite sprites[SPRITE_MAX];
+	SpriteId sprite_count;
+	Vec2 camera;
+} DisplayServer;
 
 
 void display_init();
 void display_destroy();
-
 void display_render();
-void display_clear();
-void display_putchar(int x, int y, Glyph glyph, ZIndex z_index);
+
+void camera_set_position(Vec2 position);
+
+SpriteId sprite_create(TextureId texture, Vec2 position, Vec2 offset);
+void sprite_destroy(SpriteId sprite);
+
+void sprite_set_texture(SpriteId sprite, TextureId texture);
+void sprite_set_position(SpriteId sprite, Vec2 position);
+void sprite_set_offset(SpriteId sprite, Vec2 offset);
+void sprite_set_enabled(SpriteId sprite, bool enabled);
 
 
 #endif // DISPLAY_H

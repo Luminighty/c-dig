@@ -58,7 +58,8 @@ typedef struct {
 
 
 void physics_init();
-void physics_deinit();
+void physics_destroy();
+void physics_render();
 
 ColliderId collider_create(EntityId parent, Vec2 center, Vec2 extends);
 Collider* collider_get(ColliderId id);

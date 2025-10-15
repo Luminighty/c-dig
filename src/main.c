@@ -9,7 +9,6 @@ int main() {
 	SetTargetFPS(60);
 	
 	game_init();
-	display_init();
 	
 	while (!WindowShouldClose()) {
 		game_update();

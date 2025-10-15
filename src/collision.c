@@ -1,9 +1,11 @@
 #include "collision.h"
 #include <assert.h>
 #include <math.h>
+#include <raylib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "darray.h"
+#include "debug.h"
 #include "entity.h"
 #include "linalg.h"
 
@@ -16,7 +18,7 @@ void physics_init() {
 	da_push(server.colliders, (Collider){0});
 }
 
-void physics_deinit() {
+void physics_destroy() {
 	free(server.colliders.items);
 	server.colliders.items = NULL;
 }
@@ -224,4 +226,19 @@ inline Ray2 ray2_create(Vec2 origin, Vec2 delta) {
 		.origin = origin,
 		.delta = delta,
 	};
+}
+
+void physics_render() {
+	for_colliders(id) {
+		Collider* self = collider_get(id);
+		if (!self->alive || !self->debug)
+			continue;
+		draw_box(
+			self->box.center.x - self->box.extends.x,
+			self->box.center.y - self->box.extends.y,
+			self->box.extends.x * 2,
+			self->box.extends.y * 2,
+			self->enabled ? GREEN : GRAY
+		);
+	}
 }

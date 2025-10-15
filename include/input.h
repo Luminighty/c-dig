@@ -9,6 +9,7 @@ typedef struct {
 	Vec2 movement;
 	bool digging;
 	bool jump;
+	bool randomize_player;
 } Input;
 
 extern Input input;

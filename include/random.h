@@ -13,5 +13,7 @@ float randomf3d(unsigned int seed, int x, int y, int z);
 float randomf4d(unsigned int seed, int x, int y, int z, int w);
 
 
+int random_range(int min, int max);
+
 
 #endif // RANDOM_H

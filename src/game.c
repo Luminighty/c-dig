@@ -1,4 +1,5 @@
 #include "game.h"
+#include "assets.h"
 #include "collision.h"
 #include "config.h"
 #include "display.h"
@@ -7,6 +8,7 @@
 #include "player.h"
 #include "worldgen.h"
 #include <raylib.h>
+#include "debug.h"
 #include <stdbool.h>
 
 Game game = {0};
@@ -14,16 +16,26 @@ RenderTexture2D render_target;
 
 void game_init() {
 	physics_init();
+	display_init();
+	assets_init();
+	// DrawTexture(texture, x * TILE_PIXEL_SIZE, y * TILE_PIXEL_SIZE, WHITE);
+
 	game.map = map_create();
-	worldgen_run(game.map, 0);
-	game.player = player_create(MAP_WIDTH / 2, MAP_HEIGHT / 2);
+
+	game.player = player_create(TILE_PIXEL_SIZE * MAP_WIDTH / 2, TILE_PIXEL_SIZE * MAP_HEIGHT / 2);
+
 	render_target = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-	collider_create(1, (Vec2){.x = 0, .y = 30}, (Vec2){.x = 100, .y = 1});
+
+	ColliderId plane = collider_create(1, (Vec2){.x = 0, .y = 422}, (Vec2){.x = 500, .y = 5});
+	// collider_get(plane)->debug = true;
 }
 
 void game_destroy() {
 	map_destroy(game.map);
-	physics_deinit();
+
+	assets_destroy();
+	display_destroy();
+	physics_destroy();
 }
 
 void game_update() {
@@ -39,11 +51,10 @@ static const Rectangle RENDER_DEST = {
 	.x = 0, .y = 0, .width = TARGET_WINDOW_WIDTH, .height = TARGET_WINDOW_HEIGHT
 };
 void game_draw() {
-	display_clear();
-	map_render(game.map);
 	player_render(&game.player);
 
 	BeginTextureMode(render_target);
+	ClearBackground(BLACK);
 	display_render();
 	EndTextureMode();
 

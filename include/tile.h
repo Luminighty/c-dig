@@ -1,7 +1,7 @@
 #ifndef TILE_H
 #define TILE_H
 
-#include "display.h"
+#include "assets_registry.h"
 #include "material.h"
 #include <assert.h>
 
@@ -19,44 +19,30 @@ typedef enum {
 
 
 typedef enum {
+	TILE_NONE,
+
 	TILE_AIR,
 	TILE_BEDROCK,
+
 	TILE_STONE,
 	TILE_MOSS,
 	TILE_DIRT,
-
-	TILE_CRYSTAL,
-	TILE_EMERALD,
-	TILE_AMETHYST,
-	TILE_RUBY,
-
-	TILE_FUNGAL,
-	TILE_FUNGAL_MOSS,
-	TILE_FUNGAL_TRUNK,
-	TILE_FUNGAL_CAP,
-
-	TILE_ICE,
-	TILE_SNOW,
-
-	TILE_MAGMA,
-	TILE_HELLSTONE,
-	
-	TILE_VOID,
-	TILE_VOIDSTONE,
-	TILE_STEAM,
-	TILE_CHARCOAL,
 
 	TILE_GRASS,
 	TILE_COAL,
 	TILE_IRON,
 	TILE_DIAMOND,
 
+	TILE_EMERALD,
+	TILE_AMETHYST,
+	TILE_RUBY,
+
 	TILE_SIZE,
 } Tile;
 
 
-extern Glyph tile_glyphs[];
 extern TileMeta tile_meta[];
+extern TextureId tile_textures[];
 
 MaterialComposition get_tile_composition(Tile tile);
 
@@ -65,8 +51,8 @@ MaterialComposition get_tile_composition(Tile tile);
 #define tile_is_unbreakable(tile) (tile_meta[tile] & TILE_META_UNBREAKABLE)
 
 #define TILE_HARDNESS_SHIFT 0
-#define TILE_HARDNESS (TILE_HARDNESS_1 | TILE_HARDNESS_2 | TILE_HARDNESS_4 | TILE_HARDNESS_8)
-#define tile_get_hardness(tile) ((tile_meta[tile] & TILE_HARDNESS) >> TILE_HARDNESS_SHIFT)
+#define TILE_HARDNESS_BITS (TILE_HARDNESS_1 | TILE_HARDNESS_2 | TILE_HARDNESS_4 | TILE_HARDNESS_8)
+#define tile_get_hardness(tile) ((tile_meta[tile] & TILE_HARDNESS_BITS) >> TILE_HARDNESS_SHIFT)
 
 
 #endif // TILE_H
