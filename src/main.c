@@ -7,7 +7,7 @@
 int main() {
 	InitWindow(TARGET_WINDOW_WIDTH, TARGET_WINDOW_HEIGHT, WINDOW_TITLE);
 	SetTargetFPS(60);
-	
+
 	game_init();
 	
 	while (!WindowShouldClose()) {

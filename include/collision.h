@@ -51,7 +51,9 @@ typedef struct {
 typedef struct {
 	bool collided;
 	bool is_inside_box;
+	bool collided_with_tile;
 	ColliderId other;
+	CollisionBox other_box;
 	float distance;
 	Vec2 resolved_position;
 } ColliderMoveResult;

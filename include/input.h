@@ -7,6 +7,9 @@
 
 typedef struct {
 	Vec2 movement;
+	Vec2 mouse;
+	Vec2i mouse_tile;
+	bool clicked;
 	bool digging;
 	bool jump;
 	bool randomize_player;

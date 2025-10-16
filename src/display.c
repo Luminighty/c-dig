@@ -6,13 +6,14 @@
 #include "linalg.h"
 #include "map.h"
 #include "tile.h"
+#include <math.h>
 #include <raylib.h>
 #include <stdio.h>
 #include "debug.h"
 #include "collision.h"
 
 static DisplayServer display = {0};
-static Camera2D camera;
+static Camera2D camera = {0};
 
 
 void display_init() {
@@ -25,22 +26,18 @@ void display_destroy() {
 
 
 static void map_render() {
-	static const int from_x = -SCREEN_WIDTH / 2;
-	static const int from_y = -SCREEN_HEIGHT / 2;
-	static const int to_x = SCREEN_WIDTH;
-	static const int to_y = SCREEN_HEIGHT;
-
-	Vec2i offset = (Vec2i){
+	Vec2i center = (Vec2i){
 		.x = display.camera.x / TILE_PIXEL_SIZE,
 		.y = display.camera.y / TILE_PIXEL_SIZE,
 	};
-	Vec2i subtile_offset = (Vec2i){
-		.x = (int)display.camera.x % TILE_PIXEL_SIZE,
-		.y = (int)display.camera.y % TILE_PIXEL_SIZE,
-	};
-	for (int y = 0; y <= to_y; y++) {
-	for (int x = 0; x <= to_x; x++) {
-		Tile tile = map_get(game.map, offset.x + x + from_x, offset.y + y + from_y);
+	int from_x = center.x;
+	int from_y = center.y;
+	int to_x = from_x + SCREEN_WIDTH + 1;
+	int to_y = from_y + SCREEN_HEIGHT + 1;
+
+	for (int y = from_y; y <= to_y; y++) {
+	for (int x = from_x; x <= to_x; x++) {
+		Tile tile = map_get(game.map, x, y);
 		TextureId texture_id = tile_textures[tile];
 		if (texture_id == TEXTURE_NONE)
 			continue;
@@ -48,13 +45,10 @@ static void map_render() {
 		Color color = WHITE;
 		if (tile == TILE_AIR)
 			color = DARKGRAY;
-		
-
-
 		DrawTexture(
 			assets_texture(texture_id),
-			(x * TILE_PIXEL_SIZE) - subtile_offset.x,
-			(y * TILE_PIXEL_SIZE) - subtile_offset.y,
+			(x * TILE_PIXEL_SIZE),
+			(y * TILE_PIXEL_SIZE),
 			color
 		);
 	}}
@@ -63,16 +57,16 @@ static void map_render() {
 void display_render() {
 	camera.target.x = display.camera.x;
 	camera.target.y = display.camera.y;
-	map_render();
 	BeginMode2D(camera);
+	map_render();
 	for (SpriteId id = 1; id < display.sprite_count; id++) {
 		Sprite* sprite = &display.sprites[id];
 		if (!sprite->alive || !sprite->enabled)
 			continue;
 		DrawTexture(
 			assets_texture(sprite->texture),
-			sprite->position.x + sprite->offset.x,
-			sprite->position.y + sprite->offset.y,
+			round(sprite->position.x + sprite->offset.x),
+			round(sprite->position.y + sprite->offset.y),
 			WHITE
 		);
 	}
@@ -81,6 +75,7 @@ void display_render() {
 }
 
 inline void camera_set_position(Vec2 position) { display.camera = position; }
+inline Vec2 camera_get_position() { return display.camera; }
 
 SpriteId sprite_create(TextureId texture, Vec2 position, Vec2 offset) {
 	// TODO: Find an actual spot

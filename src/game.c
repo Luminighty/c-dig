@@ -22,11 +22,20 @@ void game_init() {
 
 	game.map = map_create();
 
-	game.player = player_create(TILE_PIXEL_SIZE * MAP_WIDTH / 2, TILE_PIXEL_SIZE * MAP_HEIGHT / 2);
+	int player_y = MAP_HEIGHT / 2;
+	game.player = player_create(MAP_WIDTH / 2, player_y);
 
 	render_target = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	ColliderId plane = collider_create(1, (Vec2){.x = 0, .y = 422}, (Vec2){.x = 500, .y = 5});
+	// ColliderId plane = collider_create(
+	// 	1, 
+	// 	(Vec2){
+	// 		.x = MAP_WIDTH * TILE_PIXEL_SIZE / 2.0f, .y = (player_y + 1.5) * TILE_PIXEL_SIZE
+	// 	}, 
+	// 	(Vec2){
+	// 		.x = 500,
+	// 		.y = TILE_PIXEL_SIZE / 2.
+	// 	});
 	// collider_get(plane)->debug = true;
 }
 

@@ -36,6 +36,7 @@ void display_destroy();
 void display_render();
 
 void camera_set_position(Vec2 position);
+Vec2 camera_get_position();
 
 SpriteId sprite_create(TextureId texture, Vec2 position, Vec2 offset);
 void sprite_destroy(SpriteId sprite);

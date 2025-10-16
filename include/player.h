@@ -26,6 +26,7 @@ typedef struct {
 	float speed;
 	int jump;
 	bool on_ground;
+	Vec2 velocity;
 	float gravity;
 } Movement;
 

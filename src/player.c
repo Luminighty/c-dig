@@ -15,6 +15,7 @@
 #include "work.h"
 #include "debug.h"
 
+#include <math.h>
 #include <stdio.h>
 
 
@@ -22,16 +23,18 @@
 
 Player player_create(int x, int y) {
 	EntityId id = entity_create();
-	Vec2 position = {.x = x, .y = y};
+	Vec2 position = tile_to_world_coord((Vec2i){.x=x, .y=y});
 	ColliderId collider = collider_create(id, position, (Vec2){.x = 4, .y = 4});
 	collider_get(collider)->debug = false;
 
-	Vec2 sprite_offset = (Vec2){.x = -8, .y = -13};
+	Vec2 sprite_offset = (Vec2){.x = -8, .y = -12};
+
+	printf("%f, %f\n", position.x, position.y);
 
 	Player player = {
 		.id = id,
-		.position = {.x = x, .y = y},
-		.movement = {.speed = 1.f, .gravity = 1.f},
+		.position = position,
+		.movement = {.speed = 1.5f, .gravity = 0.1f},
 		.dig = { .speed = 100 },
 		.collider = collider,
 	};
@@ -48,6 +51,7 @@ Player player_create(int x, int y) {
 }
 
 static void randomize_sprite(Player* player) {
+	printf("%f, %f\n", player->position.x, player->position.y);
 	TextureId body = random_range(TEXTURE_MINER_BODY_00, TEXTURE_MINER_BODY_05 + 1);
 	TextureId cloth = random_range(TEXTURE_MINER_CLOTH_00, TEXTURE_MINER_CLOTH_05 + 1);
 	TextureId beard = random_range(TEXTURE_MINER_BEARD_00, TEXTURE_MINER_BEARD_05 + 1);
@@ -62,10 +66,15 @@ static void randomize_sprite(Player* player) {
 static inline void player_movement(Player* player) {
 	Vec2 delta = {
 		.x = input.movement.x * player->movement.speed,
-		.y = player->movement.gravity
+		.y = fminf(player->movement.velocity.y + player->movement.gravity, 16.0f)
 	};
 	ColliderMoveResult result = collider_move(player->collider, delta);
+	Vec2 actual_delta = vec2_sub(result.resolved_position, player->position);
+	player->movement.velocity.y = actual_delta.y;
 	player->position = result.resolved_position;
+	if (input.jump)
+		player->movement.velocity.y = -2;
+
 }
 
 
@@ -108,6 +117,10 @@ void player_update(Player* player) {
 	player_dig(player);
 	if (input.randomize_player)
 		randomize_sprite(player);
+	Vec2 world_mouse = vec2_add(camera_get_position(), input.mouse);
+	Vec2i world_mouse_tile = world_to_tile_coord(world_mouse);
+	if (input.clicked)
+		map_set(game.map, world_mouse_tile.x, world_mouse_tile.y, TILE_AIR);
 }
 
 

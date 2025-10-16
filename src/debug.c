@@ -1,7 +1,7 @@
 #include "debug.h"
 
 
-static const int POINT_SIZE = 5;
+static const int POINT_SIZE = 3;
 
 void draw_point(int x, int y, Color color) {
 	DrawLine(x - POINT_SIZE, y - POINT_SIZE, x + POINT_SIZE, y + POINT_SIZE, color);

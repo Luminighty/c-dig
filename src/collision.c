@@ -2,14 +2,21 @@
 #include <assert.h>
 #include <math.h>
 #include <raylib.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "config.h"
 #include "darray.h"
 #include "debug.h"
+#include "display.h"
 #include "entity.h"
+#include "game.h"
+#include "input.h"
 #include "linalg.h"
+#include "map.h"
+#include "tile.h"
 
-#define EPSILON 0.000001f
+#define EPSILON 0.001f
 
 static PhysicsServer server = {0};
 
@@ -108,7 +115,8 @@ static inline Vec2 ray_box_normal(CollisionBox box, Ray2Extended ray, double t_h
 	double t_y2 = (bmax.y - ray.origin.y) * ray.inv.y;
 	if (t_y2 == t_hit) return (Vec2){.x = 0, .y = 1};
 
-	return (Vec2){.x = 0, .y = 0};
+	// This cannot happen.
+	assert(0);
 }
 
 
@@ -142,10 +150,50 @@ static inline ColliderMoveResult run_pass(ColliderId id, Ray2Extended ray) {
 		result.collided = true;
 		result.other = other_id;
 		result.is_inside_box = t_min < 0.0f;
+		result.other_box = other->box;
 	}
+
+	Vec2 target = vec2_add(ray.origin, ray.delta);
+	Vec2i from = world_to_tile_coord(vec2_sub(ray.origin, self->box.extends));
+	Vec2i to = world_to_tile_coord(vec2_add(target, self->box.extends));
+	Vec2i min = vec2i_min(from, to);
+	Vec2i max = vec2i_max(from, to);
+	Vec2 tile_offset = (Vec2){.x = TILE_PIXEL_SIZE / 2.0f, .y = TILE_PIXEL_SIZE / 2.0f};
+
+	for (int y = min.y - 1; y <= max.y; y++) {
+	for (int x = min.x - 1; x <= max.x; x++) {
+		Tile tile = map_get(game.map, x, y);
+		if (!tile_is_solid(tile))
+			continue;
+		double t_min = 0, t_max = 0;
+		Vec2i tile_coord = {.x = x, .y = y};
+		CollisionBox tile_box = (CollisionBox){
+			.center = vec2_add(tile_to_world_coord(tile_coord), tile_offset),
+			.extends = (Vec2){
+				.x = TILE_PIXEL_SIZE / 2.f,
+				.y = TILE_PIXEL_SIZE / 2.f,
+			}
+		};
+		CollisionBox extended = tile_box;
+		extended.extends.x += self->box.extends.x;
+		extended.extends.y += self->box.extends.y;
+		if (!ray_box_intersect(extended, ray, &t_min, &t_max))
+			continue;
+		double t_hit = (t_min < 0.0) ? t_max : t_min;
+		if (t_hit < 0.0 || t_hit > result.distance)
+			continue;
+		result.distance = t_hit;
+		result.collided = true;
+		result.other = 0;
+		result.is_inside_box = t_min < 0.0f;
+		result.other_box = tile_box;
+		result.collided_with_tile = true;
+		assert(!isnan(t_hit));
+	}}
+
 	if (!result.collided)
 		return result;
-	float distance = result.distance + (result.is_inside_box ? EPSILON : -EPSILON);
+	float distance = result.distance + (result.is_inside_box ? EPSILON : -EPSILON) * 2.f;
 	result.resolved_position.x = ray.origin.x + ray.delta.x * distance;
 	result.resolved_position.y = ray.origin.y + ray.delta.y * distance;
 	return result;
@@ -153,7 +201,9 @@ static inline ColliderMoveResult run_pass(ColliderId id, Ray2Extended ray) {
 
 
 static inline Vec2 vector2_reject(Vec2 a, Vec2 b) {
-	float scale = vec2_dot(a, b) / vec2_dot(b, b);
+	float dot_b = vec2_dot(b, b);
+	assert(dot_b > EPSILON);
+	float scale = vec2_dot(a, b) / dot_b;
 	Vec2 proj_a = vec2_scale(b, scale);
 	return vec2_sub(a, proj_a);
 }
@@ -182,10 +232,8 @@ ColliderMoveResult collider_move(ColliderId id, Vec2 delta) {
 	CollisionBox temp_box = collider_get(id)->box;
 	#endif
 	
-	ColliderId prev_id = result.other;
-
 	// NOTE: Calculate slide vector
-	CollisionBox extended = collider_get(result.other)->box;
+	CollisionBox extended = result.other_box;
 	extended.extends.x += self->box.extends.x;
 	extended.extends.y += self->box.extends.y;
 	Vec2 normal = ray_box_normal(extended, ray, result.distance);
@@ -194,13 +242,12 @@ ColliderMoveResult collider_move(ColliderId id, Vec2 delta) {
 	
 	self->box.center = result.resolved_position;
 	ray = ray2_create_ex(self->box.center, delta);
-	result = run_pass(id, ray);
+	ColliderMoveResult slide_result = run_pass(id, ray);
 
-	if (!result.collided) {
-		result.other = prev_id;
-		result.collided = true;
-	}
-	self->box.center = result.resolved_position;
+	if (slide_result.collided)
+		result = slide_result;
+	
+	self->box.center = slide_result.resolved_position;
 
 	#ifdef DEBUG_ONLY
 	collider_get(id)->box = temp_box;
@@ -241,4 +288,39 @@ void physics_render() {
 			self->enabled ? GREEN : GRAY
 		);
 	}
+
+	#ifdef DEBUG_MAP
+	Vec2i min = {.x = 0, .y = 0};
+	Vec2i max = {.x = MAP_WIDTH, .y = MAP_HEIGHT};
+	Vec2 tile_offset = (Vec2){.x = TILE_PIXEL_SIZE / 2.0f, .y = TILE_PIXEL_SIZE / 2.0f};
+
+	Vec2 world_mouse = vec2_add(camera_get_position(), input.mouse);
+	Vec2i world_mouse_tile = world_to_tile_coord(world_mouse);
+
+	for (int y = min.y; y < max.y; y++) {
+	for (int x = min.x; x < max.x; x++) {
+		Tile tile = map_get(game.map, x, y);
+		if (!tile_is_solid(tile))
+			continue;
+		Vec2i tile_coord = {.x = x, .y = y};
+		CollisionBox tile_box = (CollisionBox){
+			.center = vec2_add(tile_to_world_coord(tile_coord), tile_offset),
+			.extends = (Vec2){
+				.x = TILE_PIXEL_SIZE / 2.f,
+				.y = TILE_PIXEL_SIZE / 2.f,
+			}
+		};
+		draw_box(
+			tile_box.center.x - tile_box.extends.x,
+			tile_box.center.y - tile_box.extends.y,
+			tile_box.extends.x * 2,
+			tile_box.extends.y * 2,
+			world_mouse_tile.x == x && world_mouse_tile.y == y ? GREEN : GRAY
+		);
+	}}
+	if (input.clicked) {
+		vec2i_print(world_mouse_tile);
+		printf("\n");
+	}
+	#endif // DEBUG_MAP
 }
