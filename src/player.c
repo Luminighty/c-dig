@@ -19,8 +19,6 @@
 #include <stdio.h>
 
 
-
-
 Player player_create(int x, int y) {
 	EntityId id = entity_create();
 	Vec2 position = tile_to_world_coord((Vec2i){.x=x, .y=y});
@@ -39,10 +37,10 @@ Player player_create(int x, int y) {
 		.collider = collider,
 	};
 
-	TextureId body = random_range(TEXTURE_MINER_BODY_00, TEXTURE_MINER_BODY_05 + 1);
-	TextureId cloth = random_range(TEXTURE_MINER_CLOTH_00, TEXTURE_MINER_CLOTH_05 + 1);
-	TextureId beard = random_range(TEXTURE_MINER_BEARD_00, TEXTURE_MINER_BEARD_05 + 1);
-	TextureId hat = random_range(TEXTURE_MINER_HAT_00, TEXTURE_MINER_HAT_05 + 1);
+	TextureId body = TEXTURE_MINER_BODY_00;
+	TextureId cloth = TEXTURE_MINER_CLOTH_01;
+	TextureId beard = TEXTURE_MINER_BEARD_01;
+	TextureId hat = TEXTURE_MINER_HAT_03;
 	player.sprites[PLAYER_SPRITE_SLOT_BODY] = sprite_create(body, position, sprite_offset);
 	player.sprites[PLAYER_SPRITE_SLOT_CLOTH] = sprite_create(cloth, position, sprite_offset);
 	player.sprites[PLAYER_SPRITE_SLOT_BEARD] = sprite_create(beard, position, sprite_offset);
@@ -64,17 +62,27 @@ static void randomize_sprite(Player* player) {
 
 
 static inline void player_movement(Player* player) {
+	if (input.jump && player->movement.on_ground) {
+		player->movement.velocity.y = -2;
+		player->movement.on_ground = false;
+	}
+	player->movement.velocity.y = fminf(
+		player->movement.velocity.y + player->movement.gravity,
+		16.0f
+	);
+
 	Vec2 delta = {
 		.x = input.movement.x * player->movement.speed,
-		.y = fminf(player->movement.velocity.y + player->movement.gravity, 16.0f)
+		.y = player->movement.velocity.y,
 	};
-	ColliderMoveResult result = collider_move(player->collider, delta);
-	Vec2 actual_delta = vec2_sub(result.resolved_position, player->position);
-	player->movement.velocity.y = actual_delta.y;
-	player->position = result.resolved_position;
-	if (input.jump)
-		player->movement.velocity.y = -2;
 
+	ColliderMoveResult result = collider_move(player->collider, delta);
+
+	player->position = result.resolved_position;
+	player->movement.on_ground = result.collision_normal.y < -0.5f;
+	if (fabs(result.collision_normal.y) > 0.5f)
+		player->movement.velocity.y = 0.f;
+	debug_log("normal: %f %f", result.collision_normal.x, result.collision_normal.y);
 }
 
 
@@ -131,4 +139,7 @@ void player_render(Player* player) {
 
 	for (int slot = 0; slot < PLAYER_SPRITE_SLOT_SIZE; slot++)
 		sprite_set_position(player->sprites[slot], player->position);
+
+	debug_log("on_ground: %d", player->movement.on_ground);
+	debug_log("velocity: %f %f", player->movement.velocity.x, player->movement.velocity.y);
 }

@@ -48,9 +48,10 @@ void game_destroy() {
 }
 
 void game_update() {
+	game.tick++;
+	debug_start();
 	input_update();
 	player_update(&game.player);
-	game.tick++;
 }
 
 static const Rectangle RENDER_SOURCE = {
@@ -68,4 +69,5 @@ void game_draw() {
 	EndTextureMode();
 
 	DrawTexturePro(render_target.texture, RENDER_SOURCE, RENDER_DEST, (Vector2){0}, 0, WHITE);
+	debug_end();
 }

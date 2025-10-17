@@ -244,8 +244,16 @@ ColliderMoveResult collider_move(ColliderId id, Vec2 delta) {
 	ray = ray2_create_ex(self->box.center, delta);
 	ColliderMoveResult slide_result = run_pass(id, ray);
 
-	if (slide_result.collided)
+	if (slide_result.collided) {
+		CollisionBox slide_extended_box = slide_result.other_box;
+		slide_extended_box.extends.x += self->box.extends.x;
+		slide_extended_box.extends.y += self->box.extends.y;
+		Vec2 slide_normal = ray_box_normal(slide_extended_box, ray, slide_result.distance);
 		result = slide_result;
+		result.collision_normal = vec2_normalize(vec2_add(normal, slide_normal));
+	} else {
+		result.collision_normal = normal;
+	}
 	
 	self->box.center = slide_result.resolved_position;
 

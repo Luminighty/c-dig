@@ -23,6 +23,7 @@ def vector_create(file, vector):
     vector_dot(file, vector)
     vector_lengthsqr(file, vector)
     vector_print(file, vector)
+    vector_normalize(file, vector)
 
     functions = {
         "int": {"min": "min", "max": "max"},
@@ -67,6 +68,25 @@ def vector_print(file, vector):
     values = ", ".join(["vector.{}".format(component_names[i]) for i in range(0, dim)])
 
     file.write(f"\tprintf(\"{name}({formats})\", {values});\n")
+    file.write("}\n")
+
+def vector_normalize(file, vector):
+    name = vector["name"]
+    comp = vector["component"]
+    dim = vector["dimension"]
+    prefix = vector["prefix"]
+    function_begin(name, f"{prefix}_normalize", f"{name} vector")
+    if is_header:
+        return
+
+    fields = []
+    for i in range(0, dim):
+        field = component_names[i]
+        fields.append(f".{field} = ({comp})(vector.{field} * inv_len)")
+    fields = "".join([f"\t\t{field},\n" for field in fields])
+
+    file.write(f"\tfloat inv_len = fast_inv_sqrt({prefix}_lengthsqr(vector));\n")
+    file.write(f"\treturn (({name}){{\n{fields}\t}});\n")
     file.write("}\n")
 
 
@@ -184,6 +204,20 @@ def vector_typedef(file, vector):
 
     file.write(f"}} {name};\n\n")
 
+def inv_sqrt():
+    function_begin("float", "fast_inv_sqrt", "float v")
+    if is_header:
+        return
+    file.write("""
+\tfloat vhalf = 0.5f * v;
+\tint i = *(int*)&v;
+\ti = 0x5f3759df - (i >> 1);
+\tv = *(float*)&i;
+\tv = v * (1.5f - vhalf * v * v);
+\treturn v;""".strip("\n"))
+    file.write("\n")
+    function_end()
+
 
 def write_file(_file, _is_header):
     global file, is_header
@@ -198,6 +232,9 @@ def write_file(_file, _is_header):
         for include in src_includes:
             file.write(f"#include {include}\n")
         vector_macro()
+    file.write("\n")
+
+    inv_sqrt()
     file.write("\n")
 
     for vector in vectors:

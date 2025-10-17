@@ -2,6 +2,8 @@
 #ifndef LINALG_H
 #define LINALG_H
 
+float fast_inv_sqrt(float v);
+
 typedef union {
 	struct { int x; int y; };
 	int v[2];
@@ -13,6 +15,7 @@ Vec2i vec2i_scale(Vec2i a, int scale);
 int vec2i_dot(Vec2i a, Vec2i b);
 int vec2i_lengthsqr(Vec2i vector);
 void vec2i_print(Vec2i vector);
+Vec2i vec2i_normalize(Vec2i vector);
 Vec2i vec2i_min(Vec2i a, Vec2i b);
 Vec2i vec2i_max(Vec2i a, Vec2i b);
 
@@ -27,6 +30,7 @@ Vec2 vec2_scale(Vec2 a, float scale);
 float vec2_dot(Vec2 a, Vec2 b);
 float vec2_lengthsqr(Vec2 vector);
 void vec2_print(Vec2 vector);
+Vec2 vec2_normalize(Vec2 vector);
 Vec2 vec2_min(Vec2 a, Vec2 b);
 Vec2 vec2_max(Vec2 a, Vec2 b);
 

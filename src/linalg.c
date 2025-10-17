@@ -5,6 +5,15 @@
 #define max(a, b) (a > b) ? a : b
 
 
+inline float fast_inv_sqrt(float v) {
+	float vhalf = 0.5f * v;
+	int i = *(int*)&v;
+	i = 0x5f3759df - (i >> 1);
+	v = *(float*)&i;
+	v = v * (1.5f - vhalf * v * v);
+	return v;
+}
+
 inline Vec2i vec2i_add(Vec2i a, Vec2i b) {
 	return ((Vec2i){
 		.x = a.x + b.x,
@@ -31,6 +40,13 @@ inline int vec2i_lengthsqr(Vec2i vector) {
 }
 inline void vec2i_print(Vec2i vector) {
 	printf("Vec2i(%d, %d)", vector.x, vector.y);
+}
+inline Vec2i vec2i_normalize(Vec2i vector) {
+	float inv_len = fast_inv_sqrt(vec2i_lengthsqr(vector));
+	return ((Vec2i){
+		.x = (int)(vector.x * inv_len),
+		.y = (int)(vector.y * inv_len),
+	});
 }
 inline Vec2i vec2i_min(Vec2i a, Vec2i b) {
 	return ((Vec2i){
@@ -71,6 +87,13 @@ inline float vec2_lengthsqr(Vec2 vector) {
 }
 inline void vec2_print(Vec2 vector) {
 	printf("Vec2(%f, %f)", vector.x, vector.y);
+}
+inline Vec2 vec2_normalize(Vec2 vector) {
+	float inv_len = fast_inv_sqrt(vec2_lengthsqr(vector));
+	return ((Vec2){
+		.x = (float)(vector.x * inv_len),
+		.y = (float)(vector.y * inv_len),
+	});
 }
 inline Vec2 vec2_min(Vec2 a, Vec2 b) {
 	return ((Vec2){

@@ -56,6 +56,7 @@ typedef struct {
 	CollisionBox other_box;
 	float distance;
 	Vec2 resolved_position;
+	Vec2 collision_normal;
 } ColliderMoveResult;
 
 
