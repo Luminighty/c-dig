@@ -9,6 +9,7 @@
 #include <math.h>
 #include <raylib.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include "debug.h"
 // #include "collision.h"
@@ -26,6 +27,30 @@ void display_init() {
 void display_destroy() {
 }
 
+static void light_render() {
+	Vec2i center = (Vec2i){
+		.x = display.camera.x / TILE_PIXEL_SIZE,
+		.y = display.camera.y / TILE_PIXEL_SIZE,
+	};
+	int from_x = center.x;
+	int from_y = center.y;
+	int to_x = from_x + SCREEN_WIDTH + 1;
+	int to_y = from_y + SCREEN_HEIGHT + 1;
+
+	for (int y = from_y; y <= to_y; y++) {
+	for (int x = from_x; x <= to_x; x++) {
+		uint8_t level = map_get_light_level(game.map, x, y);
+
+		Color color = ColorAlpha(BLACK, (LIGHT_LEVEL_FULL - level) / (float)LIGHT_LEVEL_FULL);
+		DrawRectangle(
+			(x * TILE_PIXEL_SIZE),
+			(y * TILE_PIXEL_SIZE),
+			TILE_PIXEL_SIZE,
+			TILE_PIXEL_SIZE,
+			color
+		);
+	}}
+}
 
 static void map_render(RenderLayer layer) {
 	Vec2i center = (Vec2i){
@@ -50,6 +75,7 @@ static void map_render(RenderLayer layer) {
 		Color color = WHITE;
 		if (tile == TILE_AIR)
 			color = DARKGRAY;
+
 		DrawTexture(
 			assets_texture(texture_id),
 			(x * TILE_PIXEL_SIZE),
@@ -65,16 +91,27 @@ static inline Sprite* get_sprite(SpriteId sprite) {
 	return &display.sprites[sprite];
 }
 
-// TODO: Probably need to keep track of flipping, ect.
-static inline Vec2 get_global_position(Sprite *sprite) {
+
+typedef struct {
+	bool flip_x;
+	Vec2 position;
+} SpriteSettings;
+
+static inline SpriteSettings get_global_settings(Sprite *sprite) {
 	Sprite* current = sprite;
-	Vec2 result = current->position;
+	SpriteSettings settings = {
+		.position = current->position,
+		.flip_x = (current->flags & SPRITE_FLAG_FLIP_X) != 0,
+	};
 	while (current->parent != 0) {
-		current = get_sprite(sprite->parent);
-		result.x += current->position.x;
-		result.y += current->position.y;
+		current = get_sprite(current->parent);
+		settings.position.x += current->position.x;
+		settings.position.y += current->position.y;
+		if (current->flags & SPRITE_FLAG_FLIP_X) {
+			settings.flip_x = !settings.flip_x;
+		}
 	}
-	return result;
+	return settings;
 }
 
 void display_render() {
@@ -94,16 +131,28 @@ void display_render() {
 			map_render(layer);
 		}
 
-		Vec2 position = get_global_position(sprite);
-		DrawTexture(
-			assets_texture(sprite->texture),
-			round(position.x + sprite->offset.x),
-			round(position.y + sprite->offset.y),
-			WHITE
-		);
+		SpriteSettings settings = get_global_settings(sprite);
+		Vec2 position = settings.position;
+		Texture2D texture = assets_texture(sprite->texture);
+		Rectangle dest = {
+			.x = position.x + sprite->offset.x,
+			.y = position.y + sprite->offset.y,
+			texture.width,
+			texture.height 
+		};
+		Rectangle source = {
+			.x = 0,
+			.y = 0,
+			texture.width,
+			texture.height,
+		};
+		if (settings.flip_x)
+			source.width *= -1;
+		DrawTexturePro(texture, source, dest, ((Vector2){0, 0}), 0.0f, WHITE);
 	}
 	while (layer + 1 < RENDER_LAYER_SIZE)
 		map_render(++layer);
+	light_render();
 	physics_render();
 	EndMode2D();
 }
@@ -217,4 +266,20 @@ void sprite_set_layer(SpriteId sprite, RenderLayer layer) {
 	size_t index = find_sorted_index(sprite);
 	display.sprites[sprite].layer = layer;
 	fix_sorted_array(sprite, index);
+}
+
+void sprite_set_flip_x(SpriteId sprite, bool flip_x) {
+	if (flip_x) {
+		display.sprites[sprite].flags |= SPRITE_FLAG_FLIP_X;
+	} else {
+		display.sprites[sprite].flags &= ~SPRITE_FLAG_FLIP_X;
+	}
+}
+
+void sprite_set_flip_y(SpriteId sprite, bool flip_y) {
+	if (flip_y) {
+		display.sprites[sprite].flags |= SPRITE_FLAG_FLIP_Y;
+	} else {
+		display.sprites[sprite].flags &= ~SPRITE_FLAG_FLIP_Y;
+	}
 }

@@ -8,13 +8,14 @@
 #define ENTITY_UNSET_TAG(world, entity, component)\
 	world->entities.component_map[entity.as.index].bytes[component / COMPONENTBITMAP_SLOTSIZE] &= ~COMPONENT_TO_SLOTBIT(component)
 
-#define ENTITY_ADD_DENSE(world, entity, container, component_tag)\
+#define ENTITY_ADD_DENSE(world, entity, container, data, component_tag)\
 	if (!entity_is_alive(world, entity))\
 		return &world->components.container[0];\
 	ENTITY_SET_TAG(world, entity, component_tag);\
+	world->components.container[entity.as.index] = data;\
 	return &world->components.container[entity.as.index]
 
-#define ENTITY_ADD_FLAG(world, entity, container, component_tag)\
+#define ENTITY_ADD_FLAG(world, entity, container, data, component_tag)\
 	if (!entity_is_alive(world, entity))\
 		return;\
 	ENTITY_SET_TAG(world, entity, component_tag);
@@ -25,15 +26,15 @@
 	ENTITY_UNSET_TAG(world, entity, component_tag);
 
 
-void entity_add_playertag(struct world* _world, union entity _entity) {	ENTITY_ADD_FLAG(_world, _entity, playertag, COMPONENT_PLAYERTAG); }
+void entity_add_playertag(struct world* _world, union entity _entity) {	ENTITY_ADD_FLAG(_world, _entity, playertag, data, COMPONENT_PLAYERTAG); }
 void entity_remove_playertag(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_PLAYERTAG); }
 
-Rigidbody* entity_add_rigidbody(struct world* _world, union entity _entity) {	ENTITY_ADD_DENSE(_world, _entity, rigidbody, COMPONENT_RIGIDBODY); }
+Rigidbody *entity_add_rigidbody(struct world* _world, union entity _entity, Rigidbody data) {	ENTITY_ADD_DENSE(_world, _entity, rigidbody, data, COMPONENT_RIGIDBODY); }
 void entity_remove_rigidbody(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_RIGIDBODY); }
 
-SpriteId* entity_add_spriteid(struct world* _world, union entity _entity) {	ENTITY_ADD_DENSE(_world, _entity, spriteid, COMPONENT_SPRITEID); }
+SpriteId *entity_add_spriteid(struct world* _world, union entity _entity, SpriteId data) {	ENTITY_ADD_DENSE(_world, _entity, spriteid, data, COMPONENT_SPRITEID); }
 void entity_remove_spriteid(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_SPRITEID); }
 
-Position* entity_add_position(struct world* _world, union entity _entity) {	ENTITY_ADD_DENSE(_world, _entity, position, COMPONENT_POSITION); }
+Position *entity_add_position(struct world* _world, union entity _entity, Position data) {	ENTITY_ADD_DENSE(_world, _entity, position, data, COMPONENT_POSITION); }
 void entity_remove_position(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_POSITION); }
 

@@ -19,6 +19,7 @@
 
 
 #define ENTITY_COUNT 512
+#define LIGHT_LEVEL_FULL 16
 
 
 typedef enum {

@@ -5,6 +5,7 @@
 #include "linalg.h"
 #include "tile.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 
 #define MAP_WIDTH (SCREEN_WIDTH * 4)
@@ -13,6 +14,7 @@
 
 typedef struct {
 	Tile tiles[MAP_HEIGHT][MAP_WIDTH];
+	uint8_t light[MAP_HEIGHT][MAP_WIDTH];
 } Map;
 
 
@@ -23,6 +25,8 @@ void map_dig(Map* map, int x, int y);
 
 Tile map_get(Map* map, int x, int y);
 void map_set(Map* map, int x, int y, Tile tile);
+uint8_t map_get_light_level(Map* map, int x, int y);
+void map_set_light_source(Map* map, int x, int y, uint8_t intensity);
 
 Vec2i world_to_tile_coord(Vec2 world);
 Vec2 tile_to_world_coord(Vec2i tile);

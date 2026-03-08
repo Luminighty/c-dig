@@ -8,7 +8,7 @@ function WriteComponentAddSrc(component)
 	local enum = string.upper(component.class_name)
 	local field = string.lower(component.class_name)
 	local storage = string.upper(component.storage)
-	local format = " {\tENTITY_ADD_%s(_world, _entity, %s, COMPONENT_%s); }\n"
+	local format = " {\tENTITY_ADD_%s(_world, _entity, %s, data, COMPONENT_%s); }\n"
 	io.write(string.format(format, storage, field, enum))
 end
 

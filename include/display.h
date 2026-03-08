@@ -61,6 +61,8 @@ void sprite_set_parent(SpriteId sprite, SpriteId new_parent);
 
 void sprite_set_zindex(SpriteId sprite, ZIndex z_index);
 void sprite_set_layer(SpriteId sprite, RenderLayer layer);
+void sprite_set_flip_x(SpriteId sprite, bool flip_x);
+void sprite_set_flip_y(SpriteId sprite, bool flip_y);
 
 
 #endif // DISPLAY_H

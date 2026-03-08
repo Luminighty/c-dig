@@ -69,13 +69,15 @@ local function generate_bitmap()
 end
 
 function WriteComponentAdd(component)
-	local ret = component.class_name .. "*"
-	if component.storage == Storage.Flag then
-		ret = "void"
-	end
+	local name = component.class_name
 	local fn = string.lower(component.class_name)
-	local format = "%s entity_add_%s(struct world* _world, union entity _entity)"
-	io.write(string.format(format, ret, fn))
+	if component.storage == Storage.Dense then
+		local format = "%s *entity_add_%s(struct world* _world, union entity _entity, %s data)"
+		io.write(string.format(format, name, fn, name))
+	elseif component.storage == Storage.Flag then
+		local format = "void entity_add_%s(struct world* _world, union entity _entity)"
+		io.write(string.format(format, fn))
+	end
 end
 
 function WriteComponentRemove(component)

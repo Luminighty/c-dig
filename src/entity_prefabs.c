@@ -8,12 +8,11 @@
 Entity entity_create_fren(World *world, Vec2 position) {
 	Entity entity = entity_create(world);
 
-	SpriteId *sprite = entity_add_spriteid(world, entity);
-	*sprite = sprite_create(TEXTURE_FREN, position, VEC2_ZERO);
-	sprite_set_layer(*sprite, RENDER_LAYER_BACKGROUND);
+	entity_add_position(world, entity, position);
 
-	Position *pos = entity_add_position(world, entity);
-	*pos = position;
+	SpriteId sprite = sprite_create(TEXTURE_FREN, position, VEC2_ZERO);
+	entity_add_spriteid(world, entity, sprite);
+	sprite_set_layer(sprite, RENDER_LAYER_BACKGROUND);
 
 	return entity;
 }

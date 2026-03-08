@@ -40,6 +40,7 @@ typedef enum {
 	// PLAYER_CURSOR_DIRT,
 	PLAYER_CURSOR_WOOD,
 	PLAYER_CURSOR_STONE,
+	PLAYER_CURSOR_TORCH,
 } PlayerCursorMode;
 
 
@@ -49,6 +50,7 @@ typedef struct {
 	Dig dig;
 	ColliderId collider;
 	PlayerCursorMode cursor_mode;
+	bool is_facing_right;
 	SpriteId sprite;
 	SpriteId sprites[PLAYER_SPRITE_SLOT_SIZE];
 } Player;

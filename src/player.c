@@ -23,12 +23,15 @@
 Player player_create(World *world, int x, int y) {
 	Entity entity = entity_create(world);
 
-	Position *position = entity_add_position(world, entity);
-	*position = tile_to_world_coord((Vec2i){.x=x, .y=y});
+	Vec2 position = tile_to_world_coord((Vec2i){.x=x, .y=y});
+	entity_add_position(world, entity, position);
 
-	Rigidbody *rb = entity_add_rigidbody(world, entity);
-	rb->id = collider_create(entity, *position, (Vec2){.x = 3, .y = 5});
-	rb->gravity = 0.1f;
+	ColliderId collider = collider_create(entity, position, (Vec2){.x = 3, .y = 5});
+	entity_add_rigidbody(world, entity, (Rigidbody){
+		.id = collider,
+		.gravity = 0.1f,
+
+	});
 
 	Vec2 sprite_offset = (Vec2){.x = -8, .y = -11};
 
@@ -37,7 +40,8 @@ Player player_create(World *world, int x, int y) {
 		.entity = entity,
 		.movement = {.speed = 1.5f},
 		.dig = { .speed = 100 },
-		.collider = rb->id,
+		.collider = collider,
+		.is_facing_right = true,
 	};
 
 	TextureId body = TEXTURE_MINER_BODY_00;
@@ -45,15 +49,15 @@ Player player_create(World *world, int x, int y) {
 	TextureId beard = TEXTURE_MINER_BEARD_01;
 	TextureId hat = TEXTURE_MINER_HAT_03;
 
-	SpriteId* sprite = entity_add_spriteid(world, entity);
-	*sprite = sprite_create(body, *position, sprite_offset);
-	player.sprites[PLAYER_SPRITE_SLOT_BODY] = *sprite;
+	player.sprite = sprite_create(body, position, sprite_offset);
+	entity_add_spriteid(world, entity, player.sprite);
+	player.sprites[PLAYER_SPRITE_SLOT_BODY] = player.sprite;
 	player.sprites[PLAYER_SPRITE_SLOT_CLOTH] = sprite_create(cloth, VEC2_ZERO, sprite_offset);
 	player.sprites[PLAYER_SPRITE_SLOT_BEARD] = sprite_create(beard, VEC2_ZERO, sprite_offset);
 	player.sprites[PLAYER_SPRITE_SLOT_HAT] = sprite_create(hat, VEC2_ZERO, sprite_offset);
-	sprite_set_parent(player.sprites[PLAYER_SPRITE_SLOT_CLOTH], *sprite);
-	sprite_set_parent(player.sprites[PLAYER_SPRITE_SLOT_BEARD], *sprite);
-	sprite_set_parent(player.sprites[PLAYER_SPRITE_SLOT_HAT], *sprite);
+	sprite_set_parent(player.sprites[PLAYER_SPRITE_SLOT_CLOTH], player.sprite);
+	sprite_set_parent(player.sprites[PLAYER_SPRITE_SLOT_BEARD], player.sprite);
+	sprite_set_parent(player.sprites[PLAYER_SPRITE_SLOT_HAT], player.sprite);
 
 	// world_print(world);
 	return player;
@@ -137,6 +141,7 @@ static char *CURSOR_LABELS[] = {
 	[PLAYER_CURSOR_DESTROY] = "DESTROY",
 	[PLAYER_CURSOR_WOOD] = "WOOD",
 	[PLAYER_CURSOR_STONE] = "STONE",
+	[PLAYER_CURSOR_TORCH] = "TORCH",
 };
 
 void player_update(Game *game, Player* player) {
@@ -153,13 +158,24 @@ void player_update(Game *game, Player* player) {
 		player->cursor_mode = PLAYER_CURSOR_WOOD;
 	if (input.slot[3])
 		player->cursor_mode = PLAYER_CURSOR_STONE;
+	if (input.slot[4])
+		player->cursor_mode = PLAYER_CURSOR_TORCH;
 	debug_log("Cursor: %s", CURSOR_LABELS[player->cursor_mode]);
 
+	int current_facing = player->is_facing_right ? 1 : -1;
+	if (current_facing * input.movement.x < 0) {
+		player->is_facing_right = input.movement.x > 0;
+		sprite_set_flip_x(player->sprite, !player->is_facing_right);
+	}
 	
 	if (input.clicked) {
 		switch (player->cursor_mode) {
 		case PLAYER_CURSOR_WOOD: player_build(game, TILE_WOOD); break;
 		case PLAYER_CURSOR_STONE: player_build(game, TILE_STONE); break;
+		case PLAYER_CURSOR_TORCH: {
+			Vec2i tile = current_mouse_tile();
+			map_set_light_source(game->map, tile.x, tile.y, 16);
+		} break;
 
 		case PLAYER_CURSOR_DESTROY:
 		default: player_build(game, TILE_AIR); break;

@@ -41,15 +41,15 @@ void entity_add_playertag(struct world* _world, union entity _entity);
 void entity_remove_playertag(struct world* _world, union entity _entity);
 
 #define entity_get_rigidbody(world, entity) entity_get_component(world, entity, rigidbody);
-Rigidbody* entity_add_rigidbody(struct world* _world, union entity _entity);
+Rigidbody *entity_add_rigidbody(struct world* _world, union entity _entity, Rigidbody data);
 void entity_remove_rigidbody(struct world* _world, union entity _entity);
 
 #define entity_get_spriteid(world, entity) entity_get_component(world, entity, spriteid);
-SpriteId* entity_add_spriteid(struct world* _world, union entity _entity);
+SpriteId *entity_add_spriteid(struct world* _world, union entity _entity, SpriteId data);
 void entity_remove_spriteid(struct world* _world, union entity _entity);
 
 #define entity_get_position(world, entity) entity_get_component(world, entity, position);
-Position* entity_add_position(struct world* _world, union entity _entity);
+Position *entity_add_position(struct world* _world, union entity _entity, Position data);
 void entity_remove_position(struct world* _world, union entity _entity);
 
 #define COMPONENTS \

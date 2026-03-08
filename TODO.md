@@ -7,13 +7,20 @@ Might make sense to open tickets later, organize them by difficulty, priority, e
 - [ ] Make sprites flippable
 - [ ] Digging should take time
 - [ ] Reorganize project structure
-- [ ] Lua as Systems
-- [ ] Multiplayer (lot of effort, requires server)
-- [ ] Load Textures from lua (generate them)
 - [ ] Tiles as lua config
+- [ ] Load Textures from lua (generate them)
 - [ ] Content Generation through lua
   - [ ] Generate Textures using colors+templates
   - [ ] Define material with tags/config/colors -> generate tile+material+texture+items
+- [ ] UI
+  - This is an important one,
+  - Investigate UI libraries, or how we could make our own
+  - Perhaps lua ui components/configs?
+  - Should be `dialog` based if possible
+    - kinda like mmos, with billions of dialogs for each thing
+    - this would let us make it composable
+- [ ] Lua as Systems
+- [ ] Multiplayer (lot of effort, requires server)
 - [ ] Better build system
   - Find dependencies automaticall,
   - Maybe lua based,
@@ -23,13 +30,6 @@ Might make sense to open tickets later, organize them by difficulty, priority, e
   - Caves,
   - ore clusters
   - Mushroom
-- [ ] UI
-  - This is an important one,
-  - Investigate UI libraries, or how we could make our own
-  - Perhaps lua ui components/configs?
-  - Should be `dialog` based if possible
-    - kinda like mmos, with billions of dialogs for each thing
-    - this would let us make it composable
 - [ ] Simulation
   - Falling saaaand
   - Liquids
