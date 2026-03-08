@@ -39,6 +39,7 @@ typedef enum {
 	// PLAYER_CURSOR_STONE,
 	// PLAYER_CURSOR_DIRT,
 	PLAYER_CURSOR_WOOD,
+	PLAYER_CURSOR_STONE,
 } PlayerCursorMode;
 
 

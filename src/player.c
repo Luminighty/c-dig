@@ -55,7 +55,7 @@ Player player_create(World *world, int x, int y) {
 	sprite_set_parent(player.sprites[PLAYER_SPRITE_SLOT_BEARD], *sprite);
 	sprite_set_parent(player.sprites[PLAYER_SPRITE_SLOT_HAT], *sprite);
 
-	world_print(world);
+	// world_print(world);
 	return player;
 }
 
@@ -136,6 +136,7 @@ static inline void player_build(Game *game, Tile tile) {
 static char *CURSOR_LABELS[] = {
 	[PLAYER_CURSOR_DESTROY] = "DESTROY",
 	[PLAYER_CURSOR_WOOD] = "WOOD",
+	[PLAYER_CURSOR_STONE] = "STONE",
 };
 
 void player_update(Game *game, Player* player) {
@@ -150,12 +151,15 @@ void player_update(Game *game, Player* player) {
 		player->cursor_mode = PLAYER_CURSOR_DESTROY;
 	if (input.slot[2])
 		player->cursor_mode = PLAYER_CURSOR_WOOD;
+	if (input.slot[3])
+		player->cursor_mode = PLAYER_CURSOR_STONE;
 	debug_log("Cursor: %s", CURSOR_LABELS[player->cursor_mode]);
 
 	
 	if (input.clicked) {
 		switch (player->cursor_mode) {
 		case PLAYER_CURSOR_WOOD: player_build(game, TILE_WOOD); break;
+		case PLAYER_CURSOR_STONE: player_build(game, TILE_STONE); break;
 
 		case PLAYER_CURSOR_DESTROY:
 		default: player_build(game, TILE_AIR); break;
