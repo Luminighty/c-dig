@@ -6,18 +6,17 @@
 #include "linalg.h"
 #include "map.h"
 #include "tile.h"
-#include <math.h>
 #include <raylib.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include "debug.h"
-// #include "collision.h"
+
 
 static DisplayServer display = {0};
 static Camera2D camera = {0};
 
 static inline void fix_sorted_array(SpriteId id, size_t current_index);
+
 
 void display_init() {
 	camera.zoom = 1.0f;
@@ -26,6 +25,7 @@ void display_init() {
 
 void display_destroy() {
 }
+
 
 static void light_render() {
 	Vec2i center = (Vec2i){
@@ -51,6 +51,7 @@ static void light_render() {
 		);
 	}}
 }
+
 
 static void map_render(RenderLayer layer) {
 	Vec2i center = (Vec2i){
@@ -85,6 +86,7 @@ static void map_render(RenderLayer layer) {
 	}}
 }
 
+
 static inline Sprite* get_sprite(SpriteId sprite) {
 	if (sprite >= display.sprite_count)
 		return &display.sprites[0];
@@ -96,6 +98,7 @@ typedef struct {
 	bool flip_x;
 	Vec2 position;
 } SpriteSettings;
+
 
 static inline SpriteSettings get_global_settings(Sprite *sprite) {
 	Sprite* current = sprite;
@@ -113,6 +116,7 @@ static inline SpriteSettings get_global_settings(Sprite *sprite) {
 	}
 	return settings;
 }
+
 
 void display_render() {
 	camera.target.x = display.camera.x;
@@ -155,10 +159,13 @@ void display_render() {
 	EndMode2D();
 }
 
+
 void camera_set_position(Vec2 position) { display.camera = position; }
 Vec2 camera_get_position() { return display.camera; }
 
+
 SpriteId sprite_create(TextureId texture, Vec2 position, Vec2 offset) {
+	assert(display.sprite_count < SPRITE_MAX);
 	// TODO: Find an actual spot
 	SpriteId id = display.sprite_count++;
 	display.sprites[id] = (Sprite){
@@ -175,9 +182,11 @@ SpriteId sprite_create(TextureId texture, Vec2 position, Vec2 offset) {
 	return id;
 }
 
+
 void sprite_destroy(SpriteId sprite) {
 	display.sprites[sprite].flags &= ~SPRITE_FLAG_ALIVE;
 }
+
 
 void sprite_set_texture(SpriteId sprite, TextureId texture) {
 	display.sprites[sprite].texture = texture;
@@ -196,9 +205,11 @@ void sprite_set_enabled(SpriteId sprite, bool enabled) {
 	}
 }
 
+
 void sprite_set_parent(SpriteId sprite, SpriteId new_parent) {
 	display.sprites[sprite].parent = new_parent;
 }
+
 
 static inline bool is_render_left_below(SpriteId left_id, SpriteId right_id) {
 	if (left_id == right_id) return false;
@@ -219,6 +230,7 @@ static inline bool is_render_left_below(SpriteId left_id, SpriteId right_id) {
 	return left_id < right_id;
 }
 
+
 static inline int find_sorted_index(SpriteId id) {
 	size_t min = 1;
 	size_t max = display.sprite_count - 1;
@@ -235,6 +247,7 @@ static inline int find_sorted_index(SpriteId id) {
 	}
 	return 0;
 }
+
 
 static inline void fix_sorted_array(SpriteId id, size_t current_index) {
 	if (current_index > 1 && is_render_left_below(id, display.sorted[current_index - 1])) {
@@ -259,12 +272,14 @@ void sprite_set_zindex(SpriteId sprite, ZIndex z_index) {
 	fix_sorted_array(sprite, index);
 }
 
+
 void sprite_set_layer(SpriteId sprite, RenderLayer layer) {
 	// NOTE: Have to find the index before modifying the sorting values
 	size_t index = find_sorted_index(sprite);
 	display.sprites[sprite].layer = layer;
 	fix_sorted_array(sprite, index);
 }
+
 
 void sprite_set_flip_x(SpriteId sprite, bool flip_x) {
 	if (flip_x) {
@@ -274,6 +289,7 @@ void sprite_set_flip_x(SpriteId sprite, bool flip_x) {
 	}
 }
 
+
 void sprite_set_flip_y(SpriteId sprite, bool flip_y) {
 	if (flip_y) {
 		display.sprites[sprite].flags |= SPRITE_FLAG_FLIP_Y;
@@ -281,3 +297,4 @@ void sprite_set_flip_y(SpriteId sprite, bool flip_y) {
 		display.sprites[sprite].flags &= ~SPRITE_FLAG_FLIP_Y;
 	}
 }
+

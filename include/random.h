@@ -1,6 +1,7 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
+void random_init();
 
 unsigned int random1d(unsigned int seed, int value);
 unsigned int random2d(unsigned int seed, int x, int y);
@@ -14,6 +15,7 @@ float randomf4d(unsigned int seed, int x, int y, int z, int w);
 
 
 int random_range(int min, int max);
+float random_frange(float min, float max);
 
 
 #endif // RANDOM_H

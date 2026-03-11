@@ -30,8 +30,14 @@
 void entity_add_playertag(struct world* _world, union entity _entity) {	ENTITY_ADD_FLAG(_world, _entity, playertag, data, COMPONENT_PLAYERTAG); }
 void entity_remove_playertag(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_PLAYERTAG); }
 
+void entity_add_randomwalk(struct world* _world, union entity _entity) {	ENTITY_ADD_FLAG(_world, _entity, randomwalk, data, COMPONENT_RANDOMWALK); }
+void entity_remove_randomwalk(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_RANDOMWALK); }
+
 Rigidbody *entity_add_rigidbody(struct world* _world, union entity _entity, Rigidbody data) {	ENTITY_ADD_DENSE(_world, _entity, rigidbody, data, COMPONENT_RIGIDBODY); }
 void entity_remove_rigidbody(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_RIGIDBODY); }
+
+Light *entity_add_light(struct world* _world, union entity _entity, Light data) {	ENTITY_ADD_DENSE(_world, _entity, light, data, COMPONENT_LIGHT); }
+void entity_remove_light(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_LIGHT); }
 
 SpriteId *entity_add_spriteid(struct world* _world, union entity _entity, SpriteId data) {	ENTITY_ADD_DENSE(_world, _entity, spriteid, data, COMPONENT_SPRITEID); }
 void entity_remove_spriteid(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_SPRITEID); }

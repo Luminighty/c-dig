@@ -7,12 +7,15 @@
 #include "input.h"
 #include "physics.h"
 #include "player.h"
+#include "random.h"
 #include "systems.h"
 
 Game game = {0};
 
 
 void game_init() {
+	random_init();
+
 	game.render_target = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	assets_init();

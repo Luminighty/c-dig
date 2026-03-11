@@ -10,18 +10,26 @@
 
 typedef struct {} PlayerTag;
 
+typedef struct {} RandomWalk;
+
 typedef struct {
-	bool on_ground;
-	ColliderId id;
 	float gravity;
+	ColliderId id;
+	bool on_ground;
 	Vec2 velocity;
 } Rigidbody;
+
+typedef struct {
+	int intensity;
+} Light;
 
 typedef Vec2 Position;
 
 typedef enum {
 	COMPONENT_PLAYERTAG,
+	COMPONENT_RANDOMWALK,
 	COMPONENT_RIGIDBODY,
+	COMPONENT_LIGHT,
 	COMPONENT_SPRITEID,
 	COMPONENT_POSITION,
 	COMPONENT_SIZE,
@@ -40,9 +48,17 @@ struct world;
 void entity_add_playertag(struct world* _world, union entity _entity);
 void entity_remove_playertag(struct world* _world, union entity _entity);
 
+#define entity_get_randomwalk(world, entity) entity_get_component(world, entity, randomwalk);
+void entity_add_randomwalk(struct world* _world, union entity _entity);
+void entity_remove_randomwalk(struct world* _world, union entity _entity);
+
 #define entity_get_rigidbody(world, entity) entity_get_component(world, entity, rigidbody);
 Rigidbody *entity_add_rigidbody(struct world* _world, union entity _entity, Rigidbody data);
 void entity_remove_rigidbody(struct world* _world, union entity _entity);
+
+#define entity_get_light(world, entity) entity_get_component(world, entity, light);
+Light *entity_add_light(struct world* _world, union entity _entity, Light data);
+void entity_remove_light(struct world* _world, union entity _entity);
 
 #define entity_get_spriteid(world, entity) entity_get_component(world, entity, spriteid);
 SpriteId *entity_add_spriteid(struct world* _world, union entity _entity, SpriteId data);
@@ -54,7 +70,9 @@ void entity_remove_position(struct world* _world, union entity _entity);
 
 #define COMPONENTS \
  FLAG(PlayerTag, playertag, COMPONENT_PLAYERTAG)\
+ FLAG(RandomWalk, randomwalk, COMPONENT_RANDOMWALK)\
  DENSE(Rigidbody, rigidbody, COMPONENT_RIGIDBODY)\
+ DENSE(Light, light, COMPONENT_LIGHT)\
  DENSE(SpriteId, spriteid, COMPONENT_SPRITEID)\
  DENSE(Position, position, COMPONENT_POSITION)
 
@@ -62,6 +80,6 @@ void entity_remove_position(struct world* _world, union entity _entity);
 typedef struct {
 	uint64_t bytes[(COMPONENT_SIZE / COMPONENTBITMAP_SLOTSIZE) + 1];
 } ComponentBitmap;
-#define COMPONENT_TO_SLOTBIT(component) (1UL << (component & COMPONENTBITMAP_SLOTSIZE))
+#define COMPONENT_TO_SLOTBIT(component) (1ULL << (component % COMPONENTBITMAP_SLOTSIZE))
 
 #endif // COMPONENT_H

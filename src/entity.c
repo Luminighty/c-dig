@@ -1,4 +1,5 @@
 #include "entity.h"
+#include "component_storage.h"
 #include "components.h"
 #include <assert.h>
 #include <stdarg.h>
@@ -25,13 +26,17 @@ Entity entity_create(World* world) {
 		world->entities.next_free[idx] = 0;
 	}
 
+	world->entities.component_map[idx] = componentbitmap_empty();
 	world->entities.alive[idx] = true;
 	uint16_t gen = ++world->entities.generation[idx];
+	printf("Creating entity (%d, %d)\n", idx, gen);
 	return (Entity){.as = {.gen = gen, .index = idx}};
 }
 
 
 bool entity_is_alive(World* world, Entity entity) {
+	if (entity.as.index == 0)
+		return false;
 	return world->entities.alive[entity.as.index]
 	    && world->entities.generation[entity.as.index] == entity.as.gen;
 }
@@ -57,8 +62,9 @@ static inline bool is_query_matches(ComponentBitmap entity_components, Component
 bool entity_has_component(World *world, Entity entity, ComponentType component) {
 	if (!entity_is_alive(world, entity))
 		return false;
-	ComponentBitmap entity_components = world->entities.component_map[entity.as.index];
-	return entity_components.bytes[component / COMPONENTBITMAP_SLOTSIZE] & COMPONENT_TO_SLOTBIT(component);
+	ComponentBitmap* entity_components = &world->entities.component_map[entity.as.index];
+	return entity_components->bytes[component / COMPONENTBITMAP_SLOTSIZE]
+		& COMPONENT_TO_SLOTBIT(component);
 }
 
 
@@ -73,7 +79,10 @@ bool entity_has_components(World* world, Entity entity, ComponentBitmap componen
 #define print_component(name, component_tag) if (entity_has_component(world, entity, component_tag)) printf(#name ", ");
 void world_print(World *world) {
 	foreach_entity(world, entity, ((ComponentBitmap){0})) {
-		printf("Entity %d: %lu", entity.as.index, world->entities.component_map[entity.as.index].bytes[0]);
+		printf("Entity %d: compbyte: %d",
+			entity.as.index, 
+			world->entities.component_map[entity.as.index].bytes[0]
+		);
 		printf("\n\t");
 
 	#define DENSE(class, _, tag) print_component(class, tag)
@@ -82,8 +91,8 @@ void world_print(World *world) {
 	#undef FLAG
 	#undef DENSE
 		printf("\n");
-
 	}
+	printf("Done\n");
 }
 #undef print_component
 

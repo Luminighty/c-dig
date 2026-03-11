@@ -50,7 +50,7 @@ Map* map_create() {
 	memset(map, 0, sizeof(Map));
 	foreach(x, y)
 		map->tiles[y][x] = TILE_STONE;
-	worldgen_run(map, 0);
+	worldgen_run(map, rand());
 	map_set_light_source(map, MAP_WIDTH / 2, MAP_HEIGHT / 2, 16);
 	return map;
 }

@@ -15,6 +15,7 @@ typedef struct {
 #undef DENSE
 } ComponentContainer;
 
+#define componentbitmap_empty(...) _componentbitmap_create(COMPONENT_SIZE)
 #define componentbitmap_create(...) _componentbitmap_create(__VA_ARGS__, COMPONENT_SIZE)
 ComponentBitmap _componentbitmap_create(ComponentType c, ...);
 

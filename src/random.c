@@ -1,4 +1,7 @@
 #include "random.h"
+#include <math.h>
+#include <stdlib.h>
+#include <time.h>
 
 #define PRIME1 198491317
 #define PRIME2 6542989
@@ -55,3 +58,12 @@ float randomf4d(unsigned int seed, int x, int y, int z, int w)	{ return to_float
 int random_range(int min, int max) {
 	return (random1d(0, inner_state++) % (max - min)) + min;
 }
+float random_frange(float min, float max) {
+	return fmodf(randomf(0, inner_state++), max - min) + min;
+}
+
+
+void random_init() {
+	srandom(time(NULL));
+}
+

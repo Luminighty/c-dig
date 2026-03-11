@@ -1,4 +1,5 @@
 #include "player.h"
+#include "entity_prefabs.h"
 #include "texture_registry.h"
 #include "components.h"
 #include "physics.h"
@@ -8,16 +9,10 @@
 #include "game.h"
 #include "input.h"
 #include "map.h"
-// #include "material.h"
 #include "linalg.h"
 #include "random.h"
 #include "tile.h"
-// #include "utils.h"
-// #include "work.h"
 #include "debug.h"
-
-#include <math.h>
-#include <stdio.h>
 
 
 Player player_create(World *world, int x, int y) {
@@ -30,7 +25,6 @@ Player player_create(World *world, int x, int y) {
 	entity_add_rigidbody(world, entity, (Rigidbody){
 		.id = collider,
 		.gravity = 0.1f,
-
 	});
 
 	Vec2 sprite_offset = (Vec2){.x = -8, .y = -11};
@@ -64,7 +58,6 @@ Player player_create(World *world, int x, int y) {
 	sprite_set_layer(player.sprites[PLAYER_SPRITE_SLOT_BEARD], RENDER_LAYER_PLAYER);
 	sprite_set_layer(player.sprites[PLAYER_SPRITE_SLOT_HAT], RENDER_LAYER_PLAYER);
 
-	// world_print(world);
 	return player;
 }
 
@@ -183,6 +176,7 @@ void player_update(Game *game, Player* player) {
 		case PLAYER_CURSOR_STONE: player_build(game, TILE_STONE); break;
 		case PLAYER_CURSOR_TORCH: {
 			Vec2i tile = current_mouse_tile();
+			entity_create_torch(&game->world, tile, 16);
 			map_set_light_source(game->map, tile.x, tile.y, 16);
 		} break;
 

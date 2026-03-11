@@ -40,6 +40,7 @@
 	TEXTURE(TILE_STONE, "./assets/textures/tile/stone.png")\
 	TEXTURE(TILE_URANIUM, "./assets/textures/tile/uranium.png")\
 	TEXTURE(TILE_WOOD, "./assets/textures/tile/wood.png")\
+	TEXTURE(TORCH, "./assets/textures/torch.png")\
 
 
 typedef enum {
