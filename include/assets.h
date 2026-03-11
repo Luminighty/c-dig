@@ -1,7 +1,7 @@
 #ifndef ASSETS_H
 #define ASSETS_H
 
-#include "assets_registry.h"
+#include "texture_registry.h"
 #include <raylib.h>
 
 

@@ -1,5 +1,5 @@
 #include "player.h"
-#include "assets_registry.h"
+#include "texture_registry.h"
 #include "components.h"
 #include "physics.h"
 #include "config.h"
@@ -44,10 +44,10 @@ Player player_create(World *world, int x, int y) {
 		.is_facing_right = true,
 	};
 
-	TextureId body = TEXTURE_MINER_BODY_00;
-	TextureId cloth = TEXTURE_MINER_CLOTH_01;
-	TextureId beard = TEXTURE_MINER_BEARD_01;
-	TextureId hat = TEXTURE_MINER_HAT_03;
+	TextureId body = TEXTURE_MINER_BODY_0000;
+	TextureId cloth = TEXTURE_MINER_CLOTH_0001;
+	TextureId beard = TEXTURE_MINER_BEARD_0001;
+	TextureId hat = TEXTURE_MINER_HAT_0003;
 
 	player.sprite = sprite_create(body, position, sprite_offset);
 	entity_add_spriteid(world, entity, player.sprite);
@@ -59,16 +59,21 @@ Player player_create(World *world, int x, int y) {
 	sprite_set_parent(player.sprites[PLAYER_SPRITE_SLOT_BEARD], player.sprite);
 	sprite_set_parent(player.sprites[PLAYER_SPRITE_SLOT_HAT], player.sprite);
 
+	sprite_set_layer(player.sprite, RENDER_LAYER_PLAYER);
+	sprite_set_layer(player.sprites[PLAYER_SPRITE_SLOT_CLOTH], RENDER_LAYER_PLAYER);
+	sprite_set_layer(player.sprites[PLAYER_SPRITE_SLOT_BEARD], RENDER_LAYER_PLAYER);
+	sprite_set_layer(player.sprites[PLAYER_SPRITE_SLOT_HAT], RENDER_LAYER_PLAYER);
+
 	// world_print(world);
 	return player;
 }
 
 
 static void randomize_sprite(Player* player) {
-	TextureId body = random_range(TEXTURE_MINER_BODY_00, TEXTURE_MINER_BODY_05 + 1);
-	TextureId cloth = random_range(TEXTURE_MINER_CLOTH_00, TEXTURE_MINER_CLOTH_05 + 1);
-	TextureId beard = random_range(TEXTURE_MINER_BEARD_00, TEXTURE_MINER_BEARD_05 + 1);
-	TextureId hat = random_range(TEXTURE_MINER_HAT_00, TEXTURE_MINER_HAT_05 + 1);
+	TextureId body = random_range(TEXTURE_MINER_BODY_0000, TEXTURE_MINER_BODY_0005 + 1);
+	TextureId cloth = random_range(TEXTURE_MINER_CLOTH_0000, TEXTURE_MINER_CLOTH_0005 + 1);
+	TextureId beard = random_range(TEXTURE_MINER_BEARD_0000, TEXTURE_MINER_BEARD_0005 + 1);
+	TextureId hat = random_range(TEXTURE_MINER_HAT_0000, TEXTURE_MINER_HAT_0005 + 1);
 	sprite_set_texture(player->sprites[PLAYER_SPRITE_SLOT_BODY], body);
 	sprite_set_texture(player->sprites[PLAYER_SPRITE_SLOT_CLOTH], cloth);
 	sprite_set_texture(player->sprites[PLAYER_SPRITE_SLOT_BEARD], beard);
@@ -132,8 +137,12 @@ static inline void player_build(Game *game, Tile tile) {
 	static const int DIG_SIZE = 3;
 	Vec2i tile_position = current_mouse_tile();
 	for (int i = 0; i < DIG_SIZE; i++)
-	for (int j = 0; j < DIG_SIZE; j++)
-		map_set(game->map, tile_position.x + i, tile_position.y + j, tile);
+	for (int j = 0; j < DIG_SIZE; j++) {
+		int x = tile_position.x + i;
+		int y = tile_position.y + j;
+		if (!tile_is_unbreakable(map_get(game->map, x, y)))
+			map_set(game->map, x, y, tile);
+	}
 }
 
 

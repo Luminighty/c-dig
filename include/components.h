@@ -12,9 +12,9 @@ typedef struct {} PlayerTag;
 
 typedef struct {
 	bool on_ground;
+	ColliderId id;
 	float gravity;
 	Vec2 velocity;
-	ColliderId id;
 } Rigidbody;
 
 typedef Vec2 Position;

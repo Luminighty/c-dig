@@ -1,5 +1,6 @@
 #define ENTITY_SET_TAG(world, entity, component)\
 	world->entities.component_map[entity.as.index].bytes[component / COMPONENTBITMAP_SLOTSIZE] |= COMPONENT_TO_SLOTBIT(component)
+
 #define ENTITY_UNSET_TAG(world, entity, component)\
 	world->entities.component_map[entity.as.index].bytes[component / COMPONENTBITMAP_SLOTSIZE] &= ~COMPONENT_TO_SLOTBIT(component)
 

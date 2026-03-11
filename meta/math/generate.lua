@@ -15,16 +15,18 @@ local function generate()
 	Vector({ name = "Vec3", component = "float", dimension = 3 })
 end
 
--- Header File Gen
-local header_file = filename .. ".h"
-io.output("./include/" .. header_file)
-HeaderBegin(header_guard)
-generate()
-HeaderEnd(header_guard)
-io.close()
+return function()
+	-- Header File Gen
+	local header_file = filename .. ".h"
+	io.output("./include/" .. header_file)
+	MathHeaderBegin(header_guard)
+	generate()
+	MathHeaderEnd(header_guard)
+	io.close()
 
--- Source File Gen
-io.output("./src/" .. filename .. ".c")
-SourceBegin(header_file, src_includes)
-generate()
-SourceEnd()
+	-- Source File Gen
+	io.output("./src/" .. filename .. ".c")
+	MathSourceBegin(header_file, src_includes)
+	generate()
+	MathSourceEnd()
+end

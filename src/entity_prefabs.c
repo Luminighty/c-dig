@@ -12,7 +12,7 @@ Entity entity_create_fren(World *world, Vec2 position) {
 
 	SpriteId sprite = sprite_create(TEXTURE_FREN, position, VEC2_ZERO);
 	entity_add_spriteid(world, entity, sprite);
-	sprite_set_layer(sprite, RENDER_LAYER_BACKGROUND);
+	sprite_set_layer(sprite, RENDER_LAYER_WALL);
 
 	return entity;
 }

@@ -1,3 +1,5 @@
+require("meta.utils")
+
 local HEADER_GUARD = "COMPONENT_H"
 
 local function print_typedef(component)
@@ -32,9 +34,7 @@ local function print_component_enum(components)
 end
 
 local function append_header_template()
-	local inp = assert(io.open("./meta/components/template_component.h", "r"))
-	io.write(inp:read("*all"))
-	inp:close()
+	PipeFile("./meta/components/template_component.h")
 end
 
 local function generate_xmacro(components)

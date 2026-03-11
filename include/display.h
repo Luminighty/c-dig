@@ -3,7 +3,7 @@
 
 #include "config.h"
 #include "linalg.h"
-#include "assets_registry.h"
+#include "texture_registry.h"
 
 #include <stdbool.h>
 #include <stdint.h>

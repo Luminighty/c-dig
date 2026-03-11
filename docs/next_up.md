@@ -9,19 +9,25 @@ I should look into the following features
 
 ## Project Structure
 
-Flat is getting a bit difficult to manage, and probably even more when it would come to onboarding
-Find a way to either update or generate makefile/lua build file
+- [ ] Flat is getting a bit difficult to manage, and probably even more when it would come to onboarding
+- [ ] Find a way to either update or generate makefile/lua build file
+
 
 ## AutoGenerate Asset Registry
 
-Find files in assets
-Build a registry from filenames automatically
-
+- [X] Find files in assets
+  - Will use `all.lua` to discover files
+- [ ] Build a texture from filenames automatically
 
 ## Tiles as Config
 
-Generate Tile data from lua configs
-Look into whenever LUA can do image manipulation
+- [X] Generate Tile data from lua configs
+- [ ] Generate tile textures from templates
+  - [ ] Texture Generator Script through raylib?
+  - [X] Gather required texture templates
+  - [ ] somehow tell generator script to generate my templates
+    - stdio?
+  - [ ] Better yet, if you manage to generate them through lua only without the need of C
 
 
 ## Light Level

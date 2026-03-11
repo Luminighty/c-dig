@@ -1,5 +1,5 @@
 #include "assets.h"
-#include "assets_registry.h"
+#include "texture_registry.h"
 #include <raylib.h>
 
 static AssetServer assets = {0};

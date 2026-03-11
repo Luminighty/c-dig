@@ -1,7 +1,7 @@
+require("meta.utils")
+
 local function append_source_template()
-	local inp = assert(io.open("./meta/components/template_component.c", "r"))
-	io.write(inp:read("*all"))
-	inp:close()
+	PipeFile("./meta/components/template_component.c")
 end
 
 function WriteComponentAddSrc(component)

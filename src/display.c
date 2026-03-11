@@ -1,6 +1,6 @@
 #include "display.h"
 #include "assets.h"
-#include "assets_registry.h"
+#include "texture_registry.h"
 #include "config.h"
 #include "game.h"
 #include "linalg.h"
@@ -119,16 +119,14 @@ void display_render() {
 	camera.target.y = display.camera.y;
 	BeginMode2D(camera);
 	RenderLayer layer = RENDER_LAYER_BACKGROUND;
-	map_render(layer);
 	for (size_t i = 1; i < display.sprite_count; i++) {
 		SpriteId id = display.sorted[i];
 		Sprite* sprite = get_sprite(id);
 		if (!(sprite->flags & (SPRITE_FLAG_ALIVE | SPRITE_FLAG_ENABLED)))
 			continue;
 
-		if (sprite->layer > layer) {
-			layer = sprite->layer;
-			map_render(layer);
+		while (sprite->layer > layer) {
+			map_render(layer++);
 		}
 
 		SpriteSettings settings = get_global_settings(sprite);
@@ -150,8 +148,8 @@ void display_render() {
 			source.width *= -1;
 		DrawTexturePro(texture, source, dest, ((Vector2){0, 0}), 0.0f, WHITE);
 	}
-	while (layer + 1 < RENDER_LAYER_SIZE)
-		map_render(++layer);
+	while (layer < RENDER_LAYER_SIZE)
+		map_render(layer++);
 	light_render();
 	physics_render();
 	EndMode2D();

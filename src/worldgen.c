@@ -28,6 +28,8 @@ static Tile generate_tile(int x, int y) {
 		return TILE_IRON;
 	if (val > 90)
 		return TILE_COAL;
+	if (val >= 80)
+		return TILE_URANIUM;
 	if (val > 10)
 		return TILE_STONE;
 	return TILE_DIRT;
