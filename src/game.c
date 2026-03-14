@@ -9,6 +9,7 @@
 #include "player.h"
 #include "random.h"
 #include "systems.h"
+#include "ui.h"
 
 Game game = {0};
 
@@ -55,6 +56,7 @@ void game_draw() {
 	EndTextureMode();
 
 	DrawTexturePro(game.render_target.texture, RENDER_SOURCE, RENDER_DEST, (Vector2){0}, 0, WHITE);
+	ui_render(&game.ui);
 	debug_end();
 }
 

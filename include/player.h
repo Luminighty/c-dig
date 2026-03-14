@@ -5,7 +5,6 @@
 #include "physics.h"
 #include "display.h"
 #include "entity_id.h"
-#include "linalg.h"
 #include "tile.h"
 #include "utils.h"
 #include <raylib.h>
@@ -34,22 +33,38 @@ typedef enum {
 	PLAYER_SPRITE_SLOT_SIZE,
 } PlayerSpriteSlot;
 
-typedef enum {
-	PLAYER_CURSOR_DESTROY,
-	// PLAYER_CURSOR_STONE,
-	// PLAYER_CURSOR_DIRT,
-	PLAYER_CURSOR_WOOD,
-	PLAYER_CURSOR_STONE,
-	PLAYER_CURSOR_TORCH,
-} PlayerCursorMode;
 
+typedef enum {
+	PLAYER_TOOL_NONE,
+	PLAYER_TOOL_PICKAXE,
+	PLAYER_TOOL_WOOD,
+	PLAYER_TOOL_STONE,
+	PLAYER_TOOL_TORCH,
+	PLAYER_TOOL_CHEST,
+	PLAYER_TOOL_FURNACE,
+	PLAYER_TOOL_WORKBENCH,
+	PLAYER_TOOL_ANVIL,
+	PLAYER_TOOL_LADDER,
+} PlayerToolKind;
+
+
+typedef struct {
+	PlayerToolKind kind;
+	bool unlimited;
+	int amount;
+} PlayerToolSlot;
+
+
+#define PLAYER_TOOLBAR_SIZE 8
 
 typedef struct {
 	Entity entity;
 	Movement movement;
 	Dig dig;
 	ColliderId collider;
-	PlayerCursorMode cursor_mode;
+	PlayerToolSlot tools[8];
+	int current_tool;
+	int tools_count;
 	bool is_facing_right;
 	SpriteId sprite;
 	SpriteId sprites[PLAYER_SPRITE_SLOT_SIZE];

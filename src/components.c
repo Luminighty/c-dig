@@ -45,3 +45,6 @@ void entity_remove_spriteid(struct world* _world, union entity _entity) {	ENTITY
 Position *entity_add_position(struct world* _world, union entity _entity, Position data) {	ENTITY_ADD_DENSE(_world, _entity, position, data, COMPONENT_POSITION); }
 void entity_remove_position(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_POSITION); }
 
+void entity_add_item(struct world* _world, union entity _entity) {	ENTITY_ADD_FLAG(_world, _entity, item, data, COMPONENT_ITEM); }
+void entity_remove_item(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_ITEM); }
+

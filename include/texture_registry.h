@@ -4,6 +4,11 @@
 
 #define REGISTRY_TEXTURES \
 	TEXTURE(FREN, "./assets/textures/fren.png")\
+	TEXTURE(FURNITURE_ANVIL, "./assets/textures/furniture/anvil.png")\
+	TEXTURE(FURNITURE_CHEST, "./assets/textures/furniture/chest.png")\
+	TEXTURE(FURNITURE_FURNACE, "./assets/textures/furniture/furnace.png")\
+	TEXTURE(FURNITURE_LADDER, "./assets/textures/furniture/ladder.png")\
+	TEXTURE(FURNITURE_WORKBENCH, "./assets/textures/furniture/workbench.png")\
 	TEXTURE(MINER_BEARD_0000, "./assets/textures/miner/beard/0000.png")\
 	TEXTURE(MINER_BEARD_0001, "./assets/textures/miner/beard/0001.png")\
 	TEXTURE(MINER_BEARD_0002, "./assets/textures/miner/beard/0002.png")\

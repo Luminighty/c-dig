@@ -13,10 +13,10 @@ typedef struct {} PlayerTag;
 typedef struct {} RandomWalk;
 
 typedef struct {
-	float gravity;
-	ColliderId id;
 	bool on_ground;
+	float gravity;
 	Vec2 velocity;
+	ColliderId id;
 } Rigidbody;
 
 typedef struct {
@@ -25,6 +25,8 @@ typedef struct {
 
 typedef Vec2 Position;
 
+typedef struct {} Item;
+
 typedef enum {
 	COMPONENT_PLAYERTAG,
 	COMPONENT_RANDOMWALK,
@@ -32,6 +34,7 @@ typedef enum {
 	COMPONENT_LIGHT,
 	COMPONENT_SPRITEID,
 	COMPONENT_POSITION,
+	COMPONENT_ITEM,
 	COMPONENT_SIZE,
 } ComponentType;
 
@@ -68,13 +71,18 @@ void entity_remove_spriteid(struct world* _world, union entity _entity);
 Position *entity_add_position(struct world* _world, union entity _entity, Position data);
 void entity_remove_position(struct world* _world, union entity _entity);
 
+#define entity_get_item(world, entity) entity_get_component(world, entity, item);
+void entity_add_item(struct world* _world, union entity _entity);
+void entity_remove_item(struct world* _world, union entity _entity);
+
 #define COMPONENTS \
  FLAG(PlayerTag, playertag, COMPONENT_PLAYERTAG)\
  FLAG(RandomWalk, randomwalk, COMPONENT_RANDOMWALK)\
  DENSE(Rigidbody, rigidbody, COMPONENT_RIGIDBODY)\
  DENSE(Light, light, COMPONENT_LIGHT)\
  DENSE(SpriteId, spriteid, COMPONENT_SPRITEID)\
- DENSE(Position, position, COMPONENT_POSITION)
+ DENSE(Position, position, COMPONENT_POSITION)\
+ FLAG(Item, item, COMPONENT_ITEM)
 
 #define COMPONENTBITMAP_SLOTSIZE 64
 typedef struct {

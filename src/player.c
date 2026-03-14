@@ -15,6 +15,15 @@
 #include "debug.h"
 
 
+static inline PlayerToolSlot *add_tool(Player *player, PlayerToolKind kind, int amount) {
+	PlayerToolSlot *slot = &player->tools[player->tools_count++];
+	slot->amount = amount;
+	slot->kind = kind;
+	slot->unlimited = false;
+	return slot;
+}
+
+
 Player player_create(World *world, int x, int y) {
 	Entity entity = entity_create(world);
 
@@ -38,6 +47,14 @@ Player player_create(World *world, int x, int y) {
 		.is_facing_right = true,
 	};
 
+	PlayerToolSlot *pickaxe = add_tool(&player, PLAYER_TOOL_PICKAXE, 0);
+	pickaxe->unlimited = true;
+	add_tool(&player, PLAYER_TOOL_WOOD, 64);
+	add_tool(&player, PLAYER_TOOL_STONE, 64);
+	add_tool(&player, PLAYER_TOOL_TORCH, 64);
+	add_tool(&player, PLAYER_TOOL_CHEST, 64);
+	add_tool(&player, PLAYER_TOOL_ANVIL, 64);
+
 	TextureId body = TEXTURE_MINER_BODY_0000;
 	TextureId cloth = TEXTURE_MINER_CLOTH_0001;
 	TextureId beard = TEXTURE_MINER_BEARD_0001;
@@ -57,6 +74,8 @@ Player player_create(World *world, int x, int y) {
 	sprite_set_layer(player.sprites[PLAYER_SPRITE_SLOT_CLOTH], RENDER_LAYER_PLAYER);
 	sprite_set_layer(player.sprites[PLAYER_SPRITE_SLOT_BEARD], RENDER_LAYER_PLAYER);
 	sprite_set_layer(player.sprites[PLAYER_SPRITE_SLOT_HAT], RENDER_LAYER_PLAYER);
+
+	world_print(world);
 
 	return player;
 }
@@ -139,12 +158,44 @@ static inline void player_build(Game *game, Tile tile) {
 }
 
 
-static char *CURSOR_LABELS[] = {
-	[PLAYER_CURSOR_DESTROY] = "DESTROY",
-	[PLAYER_CURSOR_WOOD] = "WOOD",
-	[PLAYER_CURSOR_STONE] = "STONE",
-	[PLAYER_CURSOR_TORCH] = "TORCH",
-};
+static inline void player_use(Game *game, PlayerToolSlot *slot) {
+	if (slot->amount <= 0 && !slot->unlimited)
+		return;
+	if (!slot->unlimited)
+		slot->amount--;
+
+	Vec2i tile = current_mouse_tile();
+	switch (slot->kind) {
+	case PLAYER_TOOL_NONE: break;
+	case PLAYER_TOOL_PICKAXE:
+		player_build(game, TILE_AIR); break;
+	case PLAYER_TOOL_WOOD:
+		player_build(game, TILE_WOOD);
+		break;
+	case PLAYER_TOOL_STONE:
+		player_build(game, TILE_STONE);
+		break;
+	case PLAYER_TOOL_TORCH: {
+		entity_create_torch(&game->world, tile, 16);
+	} break;
+	case PLAYER_TOOL_CHEST:
+		entity_create_furniture(&game->world, tile, TEXTURE_FURNITURE_CHEST);
+		break;
+	case PLAYER_TOOL_FURNACE:
+		entity_create_furniture(&game->world, tile, TEXTURE_FURNITURE_FURNACE);
+		break;
+	case PLAYER_TOOL_WORKBENCH:
+		entity_create_furniture(&game->world, tile, TEXTURE_FURNITURE_WORKBENCH);
+		break;
+	case PLAYER_TOOL_ANVIL:
+		entity_create_furniture(&game->world, tile, TEXTURE_FURNITURE_ANVIL);
+		break;
+	case PLAYER_TOOL_LADDER:
+		entity_create_furniture(&game->world, tile, TEXTURE_FURNITURE_LADDER);
+		break;
+	}
+}
+
 
 void player_update(Game *game, Player* player) {
 	player_movement(game, player);
@@ -154,16 +205,10 @@ void player_update(Game *game, Player* player) {
 	Vec2 world_mouse = vec2_add(camera_get_position(), input.mouse);
 	Vec2i world_mouse_tile = world_to_tile_coord(world_mouse);
 
-	if (input.slot[1])
-		player->cursor_mode = PLAYER_CURSOR_DESTROY;
-	if (input.slot[2])
-		player->cursor_mode = PLAYER_CURSOR_WOOD;
-	if (input.slot[3])
-		player->cursor_mode = PLAYER_CURSOR_STONE;
-	if (input.slot[4])
-		player->cursor_mode = PLAYER_CURSOR_TORCH;
-	debug_log("Cursor: %s", CURSOR_LABELS[player->cursor_mode]);
-
+	for (int i = 0; i < PLAYER_TOOLBAR_SIZE; i++) {
+		if (input.slot[i + 1])
+			player->current_tool = i;
+	}
 	int current_facing = player->is_facing_right ? 1 : -1;
 	if (current_facing * input.movement.x < 0) {
 		player->is_facing_right = input.movement.x > 0;
@@ -171,18 +216,7 @@ void player_update(Game *game, Player* player) {
 	}
 	
 	if (input.clicked) {
-		switch (player->cursor_mode) {
-		case PLAYER_CURSOR_WOOD: player_build(game, TILE_WOOD); break;
-		case PLAYER_CURSOR_STONE: player_build(game, TILE_STONE); break;
-		case PLAYER_CURSOR_TORCH: {
-			Vec2i tile = current_mouse_tile();
-			entity_create_torch(&game->world, tile, 16);
-			map_set_light_source(game->map, tile.x, tile.y, 16);
-		} break;
-
-		case PLAYER_CURSOR_DESTROY:
-		default: player_build(game, TILE_AIR); break;
-		}
+		player_use(game, &player->tools[player->current_tool]);
 	}
 }
 

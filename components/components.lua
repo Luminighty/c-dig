@@ -21,3 +21,5 @@ Component({ "Light", {
 ExternComponent("SpriteId")
 
 TypeAliasComponent("Position", Type.vec2)
+
+require("components.items")

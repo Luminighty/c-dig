@@ -31,7 +31,7 @@ I should look into the following features
 
 
 ## Light Level
- - [ ] store light level + sources
+ - [+] store light level + sources
  - [ ] Flood fill light
  - [ ] Automatically light (mark dirty, update at end of frame)
  - [ ] Automatically dim

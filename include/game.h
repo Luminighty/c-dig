@@ -5,6 +5,7 @@
 #include "map.h"
 #include "player.h"
 #include "systems.h"
+#include "ui.h"
 #include <raylib.h>
 #include <stdint.h>
 
@@ -15,6 +16,7 @@ typedef struct game {
 	Player player;
 	Systems systems;
 	RenderTexture2D render_target;
+	UI ui;
 } Game;
 
 extern Game game;

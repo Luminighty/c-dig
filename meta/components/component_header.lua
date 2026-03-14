@@ -64,7 +64,7 @@ local function generate_bitmap()
 	io.write("typedef struct {\n")
 	io.write("\tuint64_t bytes[(COMPONENT_SIZE / COMPONENTBITMAP_SLOTSIZE) + 1];\n")
 	io.write("} ComponentBitmap;\n")
-	io.write("#define COMPONENT_TO_SLOTBIT(component) (1UL << (component & COMPONENTBITMAP_SLOTSIZE))\n")
+	io.write("#define COMPONENT_TO_SLOTBIT(component) (1ULL << (component % COMPONENTBITMAP_SLOTSIZE))\n")
 	io.write("\n")
 end
 

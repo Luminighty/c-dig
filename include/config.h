@@ -2,11 +2,12 @@
 #define CONFIG_H
 
 
+#define TILE_PIXEL_SIZE 4
+
+// NOTE: These are in tiles
 #define SCREEN_HEIGHT (64 + 1)
 #define SCREEN_WIDTH (64 + 1)
 #define SCREEN_SIZE ((SCREEN_WIDTH) * (SCREEN_HEIGHT))
-
-#define TILE_PIXEL_SIZE 4
 
 
 #define WINDOW_WIDTH (TILE_PIXEL_SIZE * SCREEN_WIDTH)
@@ -18,7 +19,7 @@
 #define WINDOW_TITLE "VOFI Dig: Slaves of Alderheim"
 
 
-#define ENTITY_COUNT 512
+#define ENTITY_COUNT 65535
 #define LIGHT_LEVEL_FULL 16
 
 
@@ -31,5 +32,6 @@ typedef enum {
 
 	RENDER_LAYER_SIZE,
 } RenderLayer;
+
 
 #endif //  CONFIG_H
