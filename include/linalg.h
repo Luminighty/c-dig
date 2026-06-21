@@ -2,6 +2,9 @@
 #ifndef LINALG_H
 #define LINALG_H
 
+#include <stdbool.h>
+
+
 float fast_inv_sqrt(float v);
 
 
@@ -14,6 +17,7 @@ typedef union {
 Vec2i vec2i_add(Vec2i a, Vec2i b);
 Vec2i vec2i_sub(Vec2i a, Vec2i b);
 Vec2i vec2i_scale(Vec2i a, int scale);
+Vec2i vec2i_div(Vec2i a, int scale);
 int vec2i_dot(Vec2i a, Vec2i b);
 int vec2i_lengthsqr(Vec2i vector);
 Vec2i vec2i_normalize(Vec2i vector);
@@ -37,6 +41,7 @@ typedef union {
 Vec3i vec3i_add(Vec3i a, Vec3i b);
 Vec3i vec3i_sub(Vec3i a, Vec3i b);
 Vec3i vec3i_scale(Vec3i a, int scale);
+Vec3i vec3i_div(Vec3i a, int scale);
 int vec3i_dot(Vec3i a, Vec3i b);
 int vec3i_lengthsqr(Vec3i vector);
 Vec3i vec3i_normalize(Vec3i vector);
@@ -60,6 +65,7 @@ typedef union {
 Vec2 vec2_add(Vec2 a, Vec2 b);
 Vec2 vec2_sub(Vec2 a, Vec2 b);
 Vec2 vec2_scale(Vec2 a, float scale);
+Vec2 vec2_div(Vec2 a, float scale);
 float vec2_dot(Vec2 a, Vec2 b);
 float vec2_lengthsqr(Vec2 vector);
 Vec2 vec2_normalize(Vec2 vector);
@@ -83,6 +89,7 @@ typedef union {
 Vec3 vec3_add(Vec3 a, Vec3 b);
 Vec3 vec3_sub(Vec3 a, Vec3 b);
 Vec3 vec3_scale(Vec3 a, float scale);
+Vec3 vec3_div(Vec3 a, float scale);
 float vec3_dot(Vec3 a, Vec3 b);
 float vec3_lengthsqr(Vec3 vector);
 Vec3 vec3_normalize(Vec3 vector);
@@ -95,6 +102,41 @@ void vec3_print(Vec3 vector);
 #define VEC3_RIGHT 	((Vec3){ .x = 1, .y = 0, .z = 0, })
 #define VEC3_UP 	((Vec3){ .x = 0, .y = -1, .z = 0, })
 #define VEC3_DOWN 	((Vec3){ .x = 0, .y = 1, .z = 0, })
+
+
+// ////// Rect2i //////
+typedef union {
+	struct { Vec2i pos; Vec2i size; };
+	struct {
+		int x; int y;
+		int w; int h;
+	};
+} Rect2i;
+
+#define RECT2I_FMT "Rect2i(x: %d, y: %d, w: %d, h: %d)"
+#define RECT2I_ARG(rect) (rect).x, (rect).y, (rect).w, (rect).h
+bool rect2i_overlaps(Rect2i a, Rect2i b);
+bool rect2i_contains(Rect2i rect, int x, int y);
+Vec2i rect2i_center(Rect2i rect);
+#define RECT2I_FOREACH(rect, _x, _y)\
+	for (int _y = rect.y; _y <= rect.y + rect.h; _y++)\
+	for (int _x = rect.x; _x <= rect.x + rect.w; _x++)
+
+
+// ////// Rect2 //////
+typedef union {
+	struct { Vec2 pos; Vec2 size; };
+	struct {
+		float x; float y;
+		float w; float h;
+	};
+} Rect2;
+
+#define RECT2_FMT "Rect2(x: %f, y: %f, w: %f, h: %f)"
+#define RECT2_ARG(rect) (rect).x, (rect).y, (rect).w, (rect).h
+bool rect2_overlaps(Rect2 a, Rect2 b);
+bool rect2_contains(Rect2 rect, float x, float y);
+Vec2 rect2_center(Rect2 rect);
 
 
 #endif // LINALG_H

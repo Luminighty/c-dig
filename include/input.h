@@ -14,6 +14,9 @@ typedef struct {
 	bool jump;
 	bool randomize_player;
 	bool slot[10];
+
+	Vec2 ui_mouse;
+	bool ui_hovering;
 } Input;
 
 

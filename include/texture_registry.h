@@ -9,6 +9,10 @@
 	TEXTURE(FURNITURE_FURNACE, "./assets/textures/furniture/furnace.png")\
 	TEXTURE(FURNITURE_LADDER, "./assets/textures/furniture/ladder.png")\
 	TEXTURE(FURNITURE_WORKBENCH, "./assets/textures/furniture/workbench.png")\
+	TEXTURE(ITEMS_PICKAXE, "./assets/textures/items/pickaxe.png")\
+	TEXTURE(ITEMS_STONE, "./assets/textures/items/stone.png")\
+	TEXTURE(ITEMS_TORCH, "./assets/textures/items/torch.png")\
+	TEXTURE(ITEMS_WOOD, "./assets/textures/items/wood.png")\
 	TEXTURE(MINER_BEARD_0000, "./assets/textures/miner/beard/0000.png")\
 	TEXTURE(MINER_BEARD_0001, "./assets/textures/miner/beard/0001.png")\
 	TEXTURE(MINER_BEARD_0002, "./assets/textures/miner/beard/0002.png")\
@@ -46,6 +50,10 @@
 	TEXTURE(TILE_URANIUM, "./assets/textures/tile/uranium.png")\
 	TEXTURE(TILE_WOOD, "./assets/textures/tile/wood.png")\
 	TEXTURE(TORCH, "./assets/textures/torch.png")\
+	TEXTURE(UI_BUTTON, "./assets/textures/ui/button.png")\
+	TEXTURE(UI_HOTBAR, "./assets/textures/ui/hotbar.png")\
+	TEXTURE(UI_PROGRESSBAR, "./assets/textures/ui/progressbar.png")\
+	TEXTURE(UI_WINDOW, "./assets/textures/ui/window.png")\
 
 
 typedef enum {

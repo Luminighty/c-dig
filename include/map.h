@@ -8,10 +8,6 @@
 #include <stdint.h>
 
 
-#define MAP_WIDTH (SCREEN_WIDTH * 4)
-#define MAP_HEIGHT (SCREEN_HEIGHT * 4)
-
-
 typedef struct {
 	Tile tiles[MAP_HEIGHT][MAP_WIDTH];
 	uint8_t light[MAP_HEIGHT][MAP_WIDTH];

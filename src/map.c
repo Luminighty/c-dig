@@ -28,8 +28,8 @@ void map_set(Map* map, int x, int y, Tile tile) {
 
 Vec2i world_to_tile_coord(Vec2 world) {
 	return (Vec2i){
-		.x = floor(world.x / TILE_PIXEL_SIZE),
-		.y = floor(world.y / TILE_PIXEL_SIZE),
+		.x = world.x / TILE_PIXEL_SIZE,
+		.y = world.y / TILE_PIXEL_SIZE,
 	};
 }
 

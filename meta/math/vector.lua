@@ -30,6 +30,21 @@ local function vector_op(vector, method_name, op)
 	io.write(string.format("\treturn ((%s){\n%s\t});\n}\n", vector.name, table.concat(fields)))
 end
 
+local function vector_div(vector)
+	FunctionBegin(vector.name, vector.prefix .. "_div", vector.name .. " a", vector.component .. " scale")
+	if IS_HEADER then
+		return
+	end
+
+	local fields = {}
+	for i = 1, vector.dimension do
+		local field = component_names[i]
+		table.insert(fields, string.format("\t\t.%s = a.%s / scale,\n", field, field))
+	end
+	io.write(string.format("\treturn ((%s){\n%s\t});\n}\n", vector.name, table.concat(fields)))
+end
+
+
 local function vector_scale(vector)
 	FunctionBegin(vector.name, vector.prefix .. "_scale", vector.name .. " a", vector.component .. " scale")
 	if IS_HEADER then
@@ -147,6 +162,7 @@ function Vector(vector)
 	vector_op(vector, "add", "+")
 	vector_op(vector, "sub", "-")
 	vector_scale(vector)
+	vector_div(vector)
 	vector_dot(vector)
 	vector_lengthsqr(vector)
 	vector_normalize(vector)

@@ -13,10 +13,10 @@ typedef struct {} PlayerTag;
 typedef struct {} RandomWalk;
 
 typedef struct {
-	bool on_ground;
+	ColliderId id;
 	float gravity;
 	Vec2 velocity;
-	ColliderId id;
+	bool on_ground;
 } Rigidbody;
 
 typedef struct {

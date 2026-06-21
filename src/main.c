@@ -5,7 +5,7 @@
 #include "game.h"
 
 int main() {
-	InitWindow(TARGET_WINDOW_WIDTH, TARGET_WINDOW_HEIGHT, WINDOW_TITLE);
+	InitWindow(WINDOW_DIMENSION.x, WINDOW_DIMENSION.y, WINDOW_TITLE);
 	SetTargetFPS(60);
 
 	game_init();

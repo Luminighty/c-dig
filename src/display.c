@@ -26,19 +26,27 @@ void display_init() {
 void display_destroy() {
 }
 
+#define GAME_TILE_WIDTH (GAME_WIDTH / TILE_PIXEL_SIZE)
+#define GAME_TILE_HEIGHT (GAME_HEIGHT / TILE_PIXEL_SIZE)
 
-static void light_render() {
+static inline Rect2i visible_tiles_rect() {
 	Vec2i center = (Vec2i){
 		.x = display.camera.x / TILE_PIXEL_SIZE,
 		.y = display.camera.y / TILE_PIXEL_SIZE,
 	};
 	int from_x = center.x;
 	int from_y = center.y;
-	int to_x = from_x + SCREEN_WIDTH + 1;
-	int to_y = from_y + SCREEN_HEIGHT + 1;
+	int to_x = from_x + GAME_TILE_WIDTH + 1;
+	int to_y = from_y + GAME_TILE_HEIGHT + 1;
+	return (Rect2i){
+		.x = from_x, .y = from_y,
+		.w = to_x - from_x, .h = to_y - from_y
+	};
+}
 
-	for (int y = from_y; y <= to_y; y++) {
-	for (int x = from_x; x <= to_x; x++) {
+static void light_render() {
+	Rect2i rect = visible_tiles_rect();
+	RECT2I_FOREACH(rect, x, y) {
 		uint8_t level = map_get_light_level(game.map, x, y);
 
 		Color color = ColorAlpha(BLACK, (LIGHT_LEVEL_FULL - level) / (float)LIGHT_LEVEL_FULL);
@@ -49,22 +57,13 @@ static void light_render() {
 			TILE_PIXEL_SIZE,
 			color
 		);
-	}}
+	}
 }
 
 
 static void map_render(RenderLayer layer) {
-	Vec2i center = (Vec2i){
-		.x = display.camera.x / TILE_PIXEL_SIZE,
-		.y = display.camera.y / TILE_PIXEL_SIZE,
-	};
-	int from_x = center.x;
-	int from_y = center.y;
-	int to_x = from_x + SCREEN_WIDTH + 1;
-	int to_y = from_y + SCREEN_HEIGHT + 1;
-
-	for (int y = from_y; y <= to_y; y++) {
-	for (int x = from_x; x <= to_x; x++) {
+	Rect2i rect = visible_tiles_rect();
+	RECT2I_FOREACH(rect, x, y) {
 		Tile tile = map_get(game.map, x, y);
 		if (tile_render_layer(tile) != layer)
 			continue;
@@ -83,7 +82,7 @@ static void map_render(RenderLayer layer) {
 			(y * TILE_PIXEL_SIZE),
 			color
 		);
-	}}
+	}
 }
 
 

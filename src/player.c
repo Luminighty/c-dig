@@ -13,9 +13,11 @@
 #include "random.h"
 #include "tile.h"
 #include "debug.h"
+#include <assert.h>
 
 
 static inline PlayerToolSlot *add_tool(Player *player, PlayerToolKind kind, int amount) {
+	assert(player->tools_count < PLAYER_TOOLBAR_SIZE);
 	PlayerToolSlot *slot = &player->tools[player->tools_count++];
 	slot->amount = amount;
 	slot->kind = kind;
@@ -28,7 +30,7 @@ Player player_create(World *world, int x, int y) {
 	Entity entity = entity_create(world);
 
 	Vec2 position = tile_to_world_coord((Vec2i){.x=x, .y=y});
-	entity_add_position(world, entity, position);
+	entity_add_position(world, entity, (Vec2){.x = position.x, .y = position.y});
 
 	ColliderId collider = collider_create(entity, position, (Vec2){.x = 3, .y = 5});
 	entity_add_rigidbody(world, entity, (Rigidbody){
@@ -52,8 +54,8 @@ Player player_create(World *world, int x, int y) {
 	add_tool(&player, PLAYER_TOOL_WOOD, 64);
 	add_tool(&player, PLAYER_TOOL_STONE, 64);
 	add_tool(&player, PLAYER_TOOL_TORCH, 64);
-	add_tool(&player, PLAYER_TOOL_CHEST, 64);
-	add_tool(&player, PLAYER_TOOL_ANVIL, 64);
+	// add_tool(&player, PLAYER_TOOL_CHEST, 64);
+	// add_tool(&player, PLAYER_TOOL_ANVIL, 64);
 
 	TextureId body = TEXTURE_MINER_BODY_0000;
 	TextureId cloth = TEXTURE_MINER_CLOTH_0001;
@@ -146,10 +148,10 @@ static inline Vec2i current_mouse_tile() {
 
 
 static inline void player_build(Game *game, Tile tile) {
-	static const int DIG_SIZE = 3;
+	static const int BRUSH_SIZE = 3;
 	Vec2i tile_position = current_mouse_tile();
-	for (int i = 0; i < DIG_SIZE; i++)
-	for (int j = 0; j < DIG_SIZE; j++) {
+	for (int i = 0; i < BRUSH_SIZE; i++)
+	for (int j = 0; j < BRUSH_SIZE; j++) {
 		int x = tile_position.x + i;
 		int y = tile_position.y + j;
 		if (!tile_is_unbreakable(map_get(game->map, x, y)))
@@ -164,6 +166,7 @@ static inline void player_use(Game *game, PlayerToolSlot *slot) {
 	if (!slot->unlimited)
 		slot->amount--;
 
+	// TODO: Naturally this will have to be made better
 	Vec2i tile = current_mouse_tile();
 	switch (slot->kind) {
 	case PLAYER_TOOL_NONE: break;
@@ -222,8 +225,8 @@ void player_update(Game *game, Player* player) {
 
 
 void player_render(Game *game, Player* player) {
-	static const int x = SCREEN_WIDTH * TILE_PIXEL_SIZE / 2;
-	static const int y = SCREEN_HEIGHT * TILE_PIXEL_SIZE / 2;
+	int x = GAME_WIDTH / 2;
+	int y = GAME_HEIGHT / 2;
 	Position *position = entity_get_position(&game->world, player->entity);
 
 	camera_set_position((Vec2){.x = position->x - x, .y = position->y - y});

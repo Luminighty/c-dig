@@ -16,6 +16,7 @@ typedef struct game {
 	Player player;
 	Systems systems;
 	RenderTexture2D render_target;
+	RenderTexture2D ui_target;
 	UI ui;
 } Game;
 

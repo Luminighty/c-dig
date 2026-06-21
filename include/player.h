@@ -55,14 +55,14 @@ typedef struct {
 } PlayerToolSlot;
 
 
-#define PLAYER_TOOLBAR_SIZE 8
+#define PLAYER_TOOLBAR_SIZE 4
 
 typedef struct {
 	Entity entity;
 	Movement movement;
 	Dig dig;
 	ColliderId collider;
-	PlayerToolSlot tools[8];
+	PlayerToolSlot tools[PLAYER_TOOLBAR_SIZE];
 	int current_tool;
 	int tools_count;
 	bool is_facing_right;
