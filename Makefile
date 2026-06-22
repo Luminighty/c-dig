@@ -13,19 +13,23 @@ else
 	LDFLAGS += $(LDFLAGS_UNIX)
 endif
 
+ifneq ($(filter release,$(MAKECMDGOALS)),)
+    CFLAGS += -O2 -DNDEBUG
+else
+    CFLAGS += -g -O0 -Wall -Wextra -DDEV_MODE -fsanitize=address
+endif
 
 DEPS=$(wildcard $(IDIR)/*.h)
 SRCS := $(shell find src -name '*.c')
 OBJS=$(patsubst src/%.c, build/%.o, $(SRCS))
 
-.PHONY: debug release clean pre_build
+.PHONY: all debug release clean pre_build
 
 all: $(TARGET)
 
-debug: CFLAGS += -g -O0 -Wall -Wextra -DDEV_MODE
+
 debug: all
 
-release: CFLAGS += -O2 -DNDEBUG
 release: all
 
 build/%.o: src/%.c $(DEPS)

@@ -20,7 +20,8 @@ void input_update() {
 	input.mouse_tile.x = mouse_tile.x;
 	input.mouse_tile.y = mouse_tile.y;
 
-	input.clicked = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+	input.mouse_clicked = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
+	input.mouse_held = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
 
 	input.digging = IsKeyDown(KEY_LEFT_SHIFT);
 	input.jump = IsKeyPressed(KEY_SPACE);

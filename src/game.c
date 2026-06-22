@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "display.h"
 #include "entity.h"
+#include "entity_prefabs.h"
 #include "linalg.h"
 #include "map.h"
 #include "input.h"
@@ -37,8 +38,15 @@ void game_init() {
 	game.systems = systems_create();
 	game.map = map_create();
 	game.world = world_create();
-	int player_y = MAP_HEIGHT / 2;
-	game.player = player_create(&game.world, MAP_WIDTH / 2, player_y);
+
+	// int player_y = MAP_HEIGHT / 2;
+	// game.player = player_create(&game.world, MAP_WIDTH / 2, player_y);
+
+	Vec2i spawn_tile = {.x = MAP_WIDTH / 2, .y = MAP_HEIGHT / 2 };
+	game.player = player_create(&game.world, tile_to_world_coord(spawn_tile));
+
+	game.other_player = entity_create_miner(&game.world, vec2_add(tile_to_world_coord(spawn_tile), (Vec2){.x = 10 }));
+	game.chest = entity_create_furniture(&game.world, spawn_tile, TEXTURE_FURNITURE_CHEST);
 
 	systems_fire_init(&game.systems, &game.world);
 }
@@ -82,6 +90,7 @@ void game_draw() {
 	DrawTexturePro(game.ui_target.texture, UI_SOURCE, WINDOW, (Vector2){0}, 0, WHITE);
 
 	debug_end();
+	DrawFPS(10, 10);
 }
 
 
@@ -93,9 +102,10 @@ void game_update() {
 	// WARN: This is just a basic hack to get mouse casting work out of the box
 	//   At some point we probably need a better way to do this
 	if (input.ui_hovering) {
-		input.clicked = false;
+		input.mouse_clicked = false;
 	}
 	player_update(&game, &game.player);
 	systems_fire_update(&game.systems, &game.world);
+	map_update_light(game.map);
 }
 

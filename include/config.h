@@ -10,10 +10,11 @@
 
 #define TILE_PIXEL_SIZE 4
 #define ENTITY_COUNT 65535
-#define LIGHT_LEVEL_FULL 16
+#define LIGHT_LEVEL_FULL 32
 
 #define MAP_WIDTH (64 * 4)
 #define MAP_HEIGHT (64 * 4)
+
 
 // NOTE: Game Viewport in pixels
 #define GAME_HEIGHT (TILE_PIXEL_SIZE * (64 + 1))

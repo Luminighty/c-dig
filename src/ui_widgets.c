@@ -1,6 +1,5 @@
 #include "ui_widgets.h"
 #include "assets.h"
-#include "config.h"
 #include "input.h"
 #include "linalg.h"
 #include "texture_registry.h"
@@ -75,7 +74,7 @@ WindowEvent ui_window(Window *window) {
 	};
 	if (!window->visible) return WINDOW_EVENT_NONE;
 
-	Vec2i ui_mousei = {input.ui_mouse.x, input.ui_mouse.y};
+	Vec2i ui_mousei = {.x = input.ui_mouse.x, .y = input.ui_mouse.y};
 	if (window->dragged) {
 		window->rectangle.pos = vec2i_sub(ui_mousei, window->drag_offset);
 		if (IsMouseButtonReleased(0))
@@ -112,7 +111,7 @@ WindowEvent ui_window(Window *window) {
 	);
 	Vector2 title_position = (Vector2){
 		.x = window->rectangle.x + 4,
-		.y = window->rectangle.y + 2,
+		.y = window->rectangle.y + 1,
 	};
 	DrawTextEx(GetFontDefault(), window->title, title_position, FONTSIZE, 1, RAYWHITE);
 	return WINDOW_EVENT_NONE;

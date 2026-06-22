@@ -5,6 +5,7 @@
 #include "display.h"
 #include "entity.h"
 #include "entity_prefabs.h"
+#include "game.h"
 #include "linalg.h"
 #include "map.h"
 #include "physics.h"
@@ -29,21 +30,33 @@ static void random_walk_system(World *world) {
 
 	foreach_entity(world, entity, query) {
 		Position *position = entity_get_position(world, entity);
+		RandomWalk *randomwalk = entity_get_randomwalk(world, entity);
+		Vec2 delta = vec2_sub(randomwalk->target, *position);
+		if (fabsf(delta.x) > 1.0f || fabsf(delta.y) > 1.0f) {
+			Vec2 move = vec2_scale(vec2_normalize(delta), 0.2f);
+			*position = vec2_add(*position, move);
+			// printf("%f,%f\n", position->x, position->y);
+			continue;
+		}
 
-		float dx = random_frange(-0.01f, 0.01f);
-		float dy = random_frange(-0.01f, 0.01f);
+		// Vec2 target_delta = {
+		// 	.x = random_frange(-30.0, 30.0),
+		// 	.y = random_frange(-30.0, 30.0)
+		// };
+		// Vec2 new_pos = vec2_add(*position, target_delta);
+		Position *player_pos = entity_get_position(world, game.player.entity);
+		Vec2 new_pos = vec2_add(*player_pos, (Vec2){ .x = -50.0, .y = -30.0, });
 
-		if (position->x < 0)
-			dx = 0.1f;
-		if (position->x > 500)
-			dx = -0.1f;
-		if (position->y < 0)
-			dy = 0.1f;
-		if (position->y > 500)
-			dy = -0.1f;
+		// if (new_pos.x < 0)
+		// 	new_pos.x = 30.0f;
+		// if (new_pos.x > 500)
+		// 	new_pos.x = -30.0f;
+		// if (new_pos.y < 0)
+		// 	new_pos.y = 30.0f;
+		// if (new_pos.y > 500)
+		// 	new_pos.y = -30.0f;
 
-		position->x += dx;
-		position->y += dy;
+		randomwalk->target = new_pos;
 	}
 }
 

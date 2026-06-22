@@ -5,7 +5,10 @@ Include("physics.h")
 Include("display.h")
 
 Flag("PlayerTag")
-Flag("RandomWalk")
+
+Component({ "RandomWalk", {
+	target = Type.vec2,
+} })
 
 Component({ "Rigidbody", {
 	id = "ColliderId",

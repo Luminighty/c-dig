@@ -11,7 +11,7 @@ struct world;
 
 typedef void (*SystemFn)(struct world *_world);
 
-DATypedef(SystemArray, SystemFn);
+typedef DynamicArray(SystemFn) SystemArray;
 
 typedef struct {
 	SystemArray update;

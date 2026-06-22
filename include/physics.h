@@ -27,7 +27,8 @@ typedef struct {
 	bool enabled;
 	bool debug;
 } Collider;
-DATypedef(Colliders, Collider);
+
+typedef DynamicArray(Collider) Colliders;
 
 
 typedef struct {

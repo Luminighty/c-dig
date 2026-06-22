@@ -25,7 +25,7 @@ static inline void render_slots() {
 	for (int i = 0; i < PLAYER_TOOLBAR_SIZE; i++) {
 		PlayerToolSlot *tool = &game.player.tools[i];
 		bool is_selected = game.player.current_tool == i;
-		Rect2i rect = (Rect2i){10 + i * 37, 10, 32, 32};
+		Rect2i rect = (Rect2i){.x = 10 + i * 37, .y = 10, .w = 32, .h = 32};
 		ui_slot(rect, is_selected);
 		ui_texture(slot_texture[tool->kind], rect);
 	}

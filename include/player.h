@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 
+#include "linalg.h"
 #include "physics.h"
 #include "display.h"
 #include "entity_id.h"
@@ -61,21 +62,18 @@ typedef struct {
 	Entity entity;
 	Movement movement;
 	Dig dig;
-	ColliderId collider;
 	PlayerToolSlot tools[PLAYER_TOOLBAR_SIZE];
 	int current_tool;
 	int tools_count;
 	bool is_facing_right;
-	SpriteId sprite;
-	SpriteId sprites[PLAYER_SPRITE_SLOT_SIZE];
-} Player;
+} PlayerController;
 
 
 struct world;
 struct game;
-Player player_create(struct world *world, int x, int y);
-void player_update(struct game *game, Player* player);
-void player_render(struct game *game, Player* player);
+PlayerController player_create(struct world *world, Vec2 position);
+void player_update(struct game *game, PlayerController* player);
+void player_render(struct game *game, PlayerController* player);
 
 
 #endif // PLAYER_H

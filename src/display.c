@@ -39,7 +39,7 @@ static inline Rect2i visible_tiles_rect() {
 	int to_x = from_x + GAME_TILE_WIDTH + 1;
 	int to_y = from_y + GAME_TILE_HEIGHT + 1;
 	return (Rect2i){
-		.x = from_x, .y = from_y,
+		.x = from_x - 1, .y = from_y - 1,
 		.w = to_x - from_x, .h = to_y - from_y
 	};
 }

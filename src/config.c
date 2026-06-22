@@ -21,7 +21,7 @@ Rect2 game_viewport() {
 		.h = GAME_HEIGHT * GAME_SCALE
 	};
 	viewport.pos = vec2_sub(
-		(Vec2){WINDOW_DIMENSION.x, WINDOW_DIMENSION.y}, 
+		(Vec2){.x = WINDOW_DIMENSION.x, .y = WINDOW_DIMENSION.y}, 
 		viewport.size
 	);
 	viewport.pos = vec2_div(viewport.pos, 2);

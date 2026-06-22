@@ -10,13 +10,15 @@
 
 typedef struct {} PlayerTag;
 
-typedef struct {} RandomWalk;
+typedef struct {
+	Vec2 target;
+} RandomWalk;
 
 typedef struct {
-	ColliderId id;
 	float gravity;
-	Vec2 velocity;
+	ColliderId id;
 	bool on_ground;
+	Vec2 velocity;
 } Rigidbody;
 
 typedef struct {
@@ -52,7 +54,7 @@ void entity_add_playertag(struct world* _world, union entity _entity);
 void entity_remove_playertag(struct world* _world, union entity _entity);
 
 #define entity_get_randomwalk(world, entity) entity_get_component(world, entity, randomwalk);
-void entity_add_randomwalk(struct world* _world, union entity _entity);
+RandomWalk *entity_add_randomwalk(struct world* _world, union entity _entity, RandomWalk data);
 void entity_remove_randomwalk(struct world* _world, union entity _entity);
 
 #define entity_get_rigidbody(world, entity) entity_get_component(world, entity, rigidbody);
@@ -77,7 +79,7 @@ void entity_remove_item(struct world* _world, union entity _entity);
 
 #define COMPONENTS \
  FLAG(PlayerTag, playertag, COMPONENT_PLAYERTAG)\
- FLAG(RandomWalk, randomwalk, COMPONENT_RANDOMWALK)\
+ DENSE(RandomWalk, randomwalk, COMPONENT_RANDOMWALK)\
  DENSE(Rigidbody, rigidbody, COMPONENT_RIGIDBODY)\
  DENSE(Light, light, COMPONENT_LIGHT)\
  DENSE(SpriteId, spriteid, COMPONENT_SPRITEID)\

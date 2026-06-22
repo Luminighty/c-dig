@@ -4,11 +4,11 @@ Just a long list of things that needs to be done with varying difficulties.
 Might make sense to open tickets later, organize them by difficulty, priority, ect.
 
 
-- [ ] Make sprites flippable
+- [X] Make sprites flippable
 - [ ] Digging should take time
 - [ ] Reorganize project structure
-- [ ] Tiles as lua config
-- [ ] Load Textures from lua (generate them)
+- [X] Tiles as lua config
+- [X] Load Textures from lua (generate them)
 - [ ] Content Generation through lua
   - [ ] Generate Textures using colors+templates
   - [ ] Define material with tags/config/colors -> generate tile+material+texture+items
@@ -22,8 +22,8 @@ Might make sense to open tickets later, organize them by difficulty, priority, e
 - [ ] Lua as Systems
 - [ ] Multiplayer (lot of effort, requires server)
 - [ ] Better build system
-  - Find dependencies automaticall,
-  - Maybe lua based,
+  - Find dependencies automatically
+  - Maybe lua based
   - Probably no need for incremental builds
 - [ ] Worldgen
   - For now just make it a little bit more interesting

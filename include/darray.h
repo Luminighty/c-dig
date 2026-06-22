@@ -3,27 +3,31 @@
 
 #include <memory.h>
 
-#define DATypedef(Type, Item) \
-	typedef struct { \
+#define DynamicArray(Item) \
+	struct { \
 		Item *items; \
 		size_t count; \
 		size_t capacity; \
-	} Type
+	}
 
 
 #define da_push(vec, value)\
 	do {\
-	if (vec.count >= vec.capacity) {\
-		if (vec.capacity == 0) vec.capacity = 256;\
-		else vec.capacity *= 2;\
-		vec.items = realloc(vec.items, vec.capacity * sizeof(*vec.items));\
+	if ((vec).count >= (vec).capacity) {\
+		if ((vec).capacity == 0) (vec).capacity = 256;\
+		else (vec).capacity *= 2;\
+		(vec).items = realloc((vec).items, (vec).capacity * sizeof(*(vec).items));\
 	}\
-	vec.items[vec.count++] = value;\
+	(vec).items[(vec).count++] = value;\
 	} while (0)
 
 
 #define da_pop(vec) vec.items[--vec.count]
-#define da_free(vec) do { vec.count = 0; } while(0)
+#define da_clear(vec) do { vec.count = 0; } while(0)
+#define da_free(vec) do {                       \
+	vec.count = 0; vec.capacity = 0;        \
+	free(vec.items); vec.items = NULL;      \
+} while(0) 
 
 
 #endif // VEC_H

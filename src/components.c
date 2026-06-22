@@ -30,7 +30,7 @@
 void entity_add_playertag(struct world* _world, union entity _entity) {	ENTITY_ADD_FLAG(_world, _entity, playertag, data, COMPONENT_PLAYERTAG); }
 void entity_remove_playertag(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_PLAYERTAG); }
 
-void entity_add_randomwalk(struct world* _world, union entity _entity) {	ENTITY_ADD_FLAG(_world, _entity, randomwalk, data, COMPONENT_RANDOMWALK); }
+RandomWalk *entity_add_randomwalk(struct world* _world, union entity _entity, RandomWalk data) {	ENTITY_ADD_DENSE(_world, _entity, randomwalk, data, COMPONENT_RANDOMWALK); }
 void entity_remove_randomwalk(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_RANDOMWALK); }
 
 Rigidbody *entity_add_rigidbody(struct world* _world, union entity _entity, Rigidbody data) {	ENTITY_ADD_DENSE(_world, _entity, rigidbody, data, COMPONENT_RIGIDBODY); }

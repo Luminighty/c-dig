@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "entity.h"
+#include "entity_id.h"
 #include "map.h"
 #include "player.h"
 #include "systems.h"
@@ -13,11 +14,14 @@ typedef struct game {
 	uint64_t tick;
 	World world;
 	Map *map;
-	Player player;
+	PlayerController player;
 	Systems systems;
 	RenderTexture2D render_target;
 	RenderTexture2D ui_target;
 	UI ui;
+	// NOTE: TEMP fields
+	Entity other_player;
+	Entity chest;
 } Game;
 
 extern Game game;
