@@ -16,17 +16,27 @@
 #include <fcntl.h>
 #include <errno.h>
 
-// TODO: Check what flags to use
-// TODO: Set nonblocking, reuse, ect
-
 #define MAX_LISTEN_COUNT 8
+static const uint16_t MAGIC = 0xD19;
+static const uint16_t MAGIC_RESP = 0xD04;
+
+typedef struct {
+	size_t magic;
+	NetId id;
+} Handshake;
+
+typedef struct {
+	size_t magic;
+	NetId id;
+	uint16_t port;
+} HandshakeResponse;
 
 typedef struct {
 	uint16_t port;
 	uint32_t ip;
 } NetAddress;
 
-// TODO: Double check if these are valid
+
 static inline struct sockaddr_in address_into_sockaddr(NetAddress address) {
 	struct sockaddr_in addr = {0};
 	addr.sin_addr.s_addr = htonl(address.ip);
@@ -47,6 +57,7 @@ typedef struct {
 	NetId id;
 	NetAddress address;
 	int tcp;
+	bool ready;
 } Connection;
 typedef DynamicArray(Connection) Connections;
 
@@ -60,18 +71,10 @@ typedef struct net_server {
 } NetServer;
 
 
-static inline NetResult net_closed() {
-	return (NetResult){ .status = NET_CLOSED, .length = 0 };
-}
-static inline NetResult net_none() {
-	return (NetResult){ .status = NET_NONE, .length = 0 };
-}
-static inline NetResult net_ok(size_t len) {
-	return (NetResult){ .status = NET_OK, .length = len };
-}
-static inline NetResult net_err() {
-	return (NetResult){ .status = NET_ERR, .length = 0 };
-}
+static inline NetResult net_closed()       { return (NetResult){ .status = NET_CLOSED,.length = 0 }; }
+static inline NetResult net_none()         { return (NetResult){ .status = NET_NONE,  .length = 0 }; }
+static inline NetResult net_ok(size_t len) { return (NetResult){ .status = NET_OK,    .length = len }; }
+static inline NetResult net_err()          { return (NetResult){ .status = NET_ERR,   .length = 0 }; }
 
 static inline bool netaddress_eq(NetAddress a, NetAddress b) {
 	return a.ip == b.ip && a.port == b.port;
@@ -153,8 +156,7 @@ NetServer *server_open(uint16_t port) {
 	assert(bind(server->udp, (struct sockaddr*)&addr, sizeof(addr)) == 0);
 	assert(bind(server->tcp, (struct sockaddr*)&addr, sizeof(addr)) == 0);
 
-	server->address.port = port;
-	server->address.ip = ntohl(addr.sin_addr.s_addr);
+	server->address = address_from_sockaddr(addr);
 
 	assert(listen(server->tcp, MAX_LISTEN_COUNT) == 0);
 
@@ -184,12 +186,18 @@ NetId server_accept(NetServer *server) {
 	int client_fd = accept(server->tcp, (struct sockaddr *)&addr, &len);
 	if (client_fd >= 0) {
 		NetId id = ++server->last_id;
-		da_push(server->connections, ((Connection){
+		Connection conn = {
 			.id = id,
 			.address = address_from_sockaddr(addr),
 			.tcp = client_fd,
-		}));
+		};
+		da_push(server->connections, conn);
 		set_nonblocking(client_fd);
+		
+		// NOTE: We should validate that this gets sent
+		Handshake handshake = { .id = id, .magic = MAGIC };
+		server_tcp_send(server, id, &handshake, sizeof(Handshake));
+
 		return id;
 	}
 
@@ -214,10 +222,8 @@ void server_disconnect(NetServer *server, NetId client_id) {
 
 NetResult server_tcp_send(NetServer *server, NetId recipient, const void *message, size_t length) {
 	Connection *client = find_connection(server, recipient);
-	// TODO: We should probably report this or assert on it!
 	if (client == NULL) return net_none();
 	ssize_t n = send(client->tcp, message, length, MSG_NOSIGNAL);
-	// TODO: Report back that the socket is closed
 	if (n >= 0)
 		return net_ok(n);
 	if (errno == EWOULDBLOCK || errno == EAGAIN)
@@ -229,8 +235,27 @@ NetResult server_tcp_send(NetServer *server, NetId recipient, const void *messag
 
 NetResult server_tcp_recv(NetServer *server, NetId sender, void *buffer, size_t length) {
 	Connection *client = find_connection(server, sender);
-	// TODO: We should probably report this or assert on it!
 	if (client == NULL) return net_none();
+
+	// TODO: Clean this up a little bit, but its fine for now as a quick handshake
+	if (!client->ready) {
+		HandshakeResponse response = {0};
+		ssize_t n = recv(client->tcp, &response, sizeof(response), MSG_NOSIGNAL);
+		if (n == 0) {
+			on_closed(server, sender);
+			return net_closed();
+		}
+		if (n == sizeof(response)) {
+			if (response.magic != MAGIC_RESP || response.id != sender) {
+				server_disconnect(server, sender);
+				return net_closed();
+			}
+			client->address.port = response.port;
+			client->ready = true;
+		}
+		return net_none();
+	}
+
 	ssize_t n = recv(client->tcp, buffer, length, MSG_NOSIGNAL);
 	if (n == 0) {
 		on_closed(server, sender);
@@ -253,7 +278,6 @@ NetResult server_tcp_recv(NetServer *server, NetId sender, void *buffer, size_t 
 
 NetResult server_udp_send(NetServer *server, NetId recipient, const void *message, size_t length) {
 	Connection *client = find_connection(server, recipient);
-	// TODO: We should probably report this or assert on it!
 	if (client == NULL) return net_closed();
 	struct sockaddr_in addr = address_into_sockaddr(client->address);
 	ssize_t n = sendto(server->udp, message, length, 0, (struct sockaddr*)&addr, sizeof(addr));
@@ -269,19 +293,26 @@ NetResult server_udp_recv(NetServer *server, void *buffer, size_t length, NetId 
 	struct sockaddr_in addr = {0};
 	socklen_t len = sizeof(addr);
 	ssize_t n = recvfrom(server->udp, buffer, length, 0, (struct sockaddr*)&addr, &len);
+	if (n < 0 && (errno == EWOULDBLOCK || errno == EAGAIN))
+		return net_none();
+
+	printf("[UDP_RECV] %zd\n", n);
 	NetAddress address = address_from_sockaddr(addr);
+	printf("[UDP_RECV] %d %d\n", address.ip, address.port);
 
 	Connection *client = find_connection_by_address(server, address);
-	// TODO: We should probably report this or assert on it!
-	// 	Especially here, as this is an unknown client!
-	if (client == NULL) return net_none();
+	if (client == NULL) {
+		Handshake* handshake = buffer;
+		size_t index = find_connection_idx(server, handshake->id);
+		if (handshake->magic == MAGIC && index != 0) {
+			server->connections.items[index].address = address;
+		}
+		return net_none();
+	}
 	*sender = client->id;
-	// NOTE: This is not really a valid case
 	if (n == 0) return net_none();
 	if (n > 0)
 		return net_ok(n);
-	if (errno == EWOULDBLOCK || errno == EAGAIN)
-		return net_none();
 	perror("server_udp_recv");
 	return net_err();
 }
@@ -293,11 +324,11 @@ NetResult server_udp_recv(NetServer *server, void *buffer, size_t length, NetId 
 // }
 
 
-
 typedef struct net_client {
 	int tcp;
 	int udp;
 	NetAddress server;
+	NetId id;
 } NetClient;
 
 
@@ -316,11 +347,27 @@ NetClient *client_connect(const char *ipaddr, uint16_t port) {
 	client->server.ip = ntohl(addr.sin_addr.s_addr);
 
 	// WARN: we should probably handle this gracefully
+	// NOTE: connect udp lets me check the sock port
 	assert(connect(client->udp, (struct sockaddr *)&addr, sizeof(addr)) == 0);
 	assert(connect(client->tcp, (struct sockaddr *)&addr, sizeof(addr)) == 0);
 
 	client->server = address_from_sockaddr(addr);
-	// We could do a handshake here to validate the connected
+
+	struct sockaddr_in self_addr = {0};
+	socklen_t len = sizeof(self_addr);
+	assert(getsockname(client->udp, (struct sockaddr *)&self_addr, &len) == 0);
+	NetAddress self_address = address_from_sockaddr(self_addr);
+
+	Handshake handshake = {0};
+	client_tcp_recv(client, &handshake, sizeof(handshake));
+	assert(handshake.magic == MAGIC);
+	client->id = handshake.id;
+	HandshakeResponse response = {
+		.magic = MAGIC_RESP,
+		.id = handshake.id,
+		port = self_address.port
+	};
+	client_tcp_send(client, &response, sizeof(HandshakeResponse));
 
 	return client;
 }
@@ -373,6 +420,7 @@ NetResult client_udp_recv(NetClient *client, void *buffer, size_t length) {
 	socklen_t len = sizeof(addr);
 	ssize_t n = recvfrom(client->udp, buffer, length, 0, (struct sockaddr*)&addr, &len);
 	NetAddress address = address_from_sockaddr(addr);
+
 	// TODO: Might have to handle this
 	assert(netaddress_eq(address, client->server));
 

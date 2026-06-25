@@ -13,7 +13,7 @@ GameClient client = {0};
 
 void game_client_init() {
 	printf("Trying to connect...\n");
-	client.client = client_connect("0.0.0.0", DEFAULT_PORT);
+	client.client = client_connect("127.0.0.1", DEFAULT_PORT);
 }
 
 
@@ -30,6 +30,7 @@ void game_client_send_ping() {
 	NetMessageHeader header = {
 		.kind = NET_MESSAGE_PING,
 	};
-	client_tcp_send(client.client, &header, sizeof(header));
+	NetResult res = client_udp_send(client.client, &header, sizeof(header));
+	printf("Sending ping %d %zu == %lu\n", res.status, res.length, sizeof(header));
 }
 

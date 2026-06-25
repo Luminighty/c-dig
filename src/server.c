@@ -59,14 +59,34 @@ static inline void process_client(NetId sender) {
 	}
 }
 
+static inline void process_udp() {
+	NetMessageHeader header = {0};
+	static const int MAX_MESSAGES = 128;
+	int message_index = 0;
+	while (message_index++ < MAX_MESSAGES) {
+		NetId sender = 0;
+		NetResult res = server_udp_recv(
+			server.server, &header, sizeof(header), &sender
+		);
+		// printf("[UDP] %d %zu\n", res.status, res.length);
+		switch (res.status) {
+			case NET_NONE: return;
+			case NET_OK: handle_message(sender, header); break;
+			case NET_CLOSED: remove_client(sender); break;
+			case NET_ERR: break;
+		}
+	}
+}
+
+
 void game_server_update() {
 	// printf("[SERVER UPDATE]\n");
 	process_connections();
 	for (size_t i = 0; i < server.clients.count; i++) {
 		NetId sender = server.clients.items[i];
 		process_client(sender);
-	
 	}
+	process_udp();
 }
 
 
