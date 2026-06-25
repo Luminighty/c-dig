@@ -10,6 +10,7 @@
 
 Entity entity_create_miner(World *world, Vec2 position) {
 	Entity entity = entity_create(world);
+	entity_add_controllable(world, entity, (Controllable){0});
 
 	entity_add_position(world, entity, position);
 	ColliderId collider = collider_create(entity, position, (Vec2){.x = 3, .y = 5});
@@ -51,6 +52,7 @@ Entity entity_create_miner(World *world, Vec2 position) {
 
 Entity entity_create_fren(World *world, Vec2 position) {
 	Entity entity = entity_create(world);
+	entity_add_controllable(world, entity, (Controllable){0});
 
 	entity_add_position(world, entity, position);
 	entity_add_randomwalk(world, entity, (RandomWalk){.target = position });
@@ -91,6 +93,7 @@ Entity entity_create_furniture(World *world, Vec2i tile, TextureId texture) {
 
 	SpriteId sprite = sprite_create(texture, position, VEC2_ZERO);
 	entity_add_spriteid(world, entity, sprite);
+	entity_add_controllable(world, entity, (Controllable){0});
 	// sprite_set_layer(sprite, RENDER_LAYER_WALL);
 
 	return entity;

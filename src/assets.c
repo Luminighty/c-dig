@@ -1,4 +1,5 @@
 #include "assets.h"
+#include "config.h"
 #include "texture_registry.h"
 #include <raylib.h>
 
@@ -6,6 +7,7 @@ static AssetServer assets = {0};
 
 
 void assets_init() {
+	if (IS_HEADLESS) return;
 	#define TEXTURE(enum, path) assets.textures[TEXTURE_##enum] = LoadTexture(path);
 	REGISTRY_TEXTURES
 	#undef TEXTURE

@@ -33,6 +33,9 @@ void entity_remove_playertag(struct world* _world, union entity _entity) {	ENTIT
 RandomWalk *entity_add_randomwalk(struct world* _world, union entity _entity, RandomWalk data) {	ENTITY_ADD_DENSE(_world, _entity, randomwalk, data, COMPONENT_RANDOMWALK); }
 void entity_remove_randomwalk(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_RANDOMWALK); }
 
+Controllable *entity_add_controllable(struct world* _world, union entity _entity, Controllable data) {	ENTITY_ADD_DENSE(_world, _entity, controllable, data, COMPONENT_CONTROLLABLE); }
+void entity_remove_controllable(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_CONTROLLABLE); }
+
 Rigidbody *entity_add_rigidbody(struct world* _world, union entity _entity, Rigidbody data) {	ENTITY_ADD_DENSE(_world, _entity, rigidbody, data, COMPONENT_RIGIDBODY); }
 void entity_remove_rigidbody(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_RIGIDBODY); }
 

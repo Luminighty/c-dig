@@ -5,6 +5,8 @@
 static const int DEFAULT_GAME_SCALE = 3;
 static const int DEFAULT_UI_SCALE = 2;
 
+bool IS_HEADLESS = false;
+
 int GAME_SCALE = DEFAULT_GAME_SCALE;
 int UI_SCALE = DEFAULT_UI_SCALE;
 

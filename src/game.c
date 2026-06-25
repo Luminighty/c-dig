@@ -1,5 +1,6 @@
 #include "game.h"
 #include "assets.h"
+#include "client.h"
 #include "config.h"
 #include "debug.h"
 #include "display.h"
@@ -24,12 +25,15 @@ Game game = {0};
 void game_init() {
 	random_init();
 
-	// WARN: We may need to resize this during runtime, in case the window gets resized!
-	Rectangle WINDOW = { .width = WINDOW_DIMENSION.x, .height = WINDOW_DIMENSION.y };
-	int ui_width = WINDOW.width / UI_SCALE;
-	int ui_height = WINDOW.height / UI_SCALE;
-	game.render_target = LoadRenderTexture(GAME_WIDTH, GAME_HEIGHT);
-	game.ui_target = LoadRenderTexture(ui_width, ui_height);
+	if (!IS_HEADLESS) {
+		// WARN: We may need to resize this during runtime, 
+		// 	in case the window gets resized!
+		Rectangle WINDOW = { .width = WINDOW_DIMENSION.x, .height = WINDOW_DIMENSION.y };
+		int ui_width = WINDOW.width / UI_SCALE;
+		int ui_height = WINDOW.height / UI_SCALE;
+		game.render_target = LoadRenderTexture(GAME_WIDTH, GAME_HEIGHT);
+		game.ui_target = LoadRenderTexture(ui_width, ui_height);
+	}
 
 	assets_init();
 	display_init();
@@ -107,5 +111,10 @@ void game_update() {
 	player_update(&game, &game.player);
 	systems_fire_update(&game.systems, &game.world);
 	map_update_light(game.map);
+
+
+	if (IsKeyDown(KEY_P))
+		game_client_send_ping();
+
 }
 

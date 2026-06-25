@@ -10,6 +10,11 @@ Component({ "RandomWalk", {
 	target = Type.vec2,
 } })
 
+-- Eventually we need to replace this with a better player index
+Component({ "Controllable", {
+	owner = Type.int,
+} })
+
 Component({ "Rigidbody", {
 	id = "ColliderId",
 	velocity = Type.vec2,

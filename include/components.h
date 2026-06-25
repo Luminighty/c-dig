@@ -15,8 +15,12 @@ typedef struct {
 } RandomWalk;
 
 typedef struct {
-	float gravity;
+	int owner;
+} Controllable;
+
+typedef struct {
 	ColliderId id;
+	float gravity;
 	bool on_ground;
 	Vec2 velocity;
 } Rigidbody;
@@ -32,6 +36,7 @@ typedef struct {} Item;
 typedef enum {
 	COMPONENT_PLAYERTAG,
 	COMPONENT_RANDOMWALK,
+	COMPONENT_CONTROLLABLE,
 	COMPONENT_RIGIDBODY,
 	COMPONENT_LIGHT,
 	COMPONENT_SPRITEID,
@@ -57,6 +62,10 @@ void entity_remove_playertag(struct world* _world, union entity _entity);
 RandomWalk *entity_add_randomwalk(struct world* _world, union entity _entity, RandomWalk data);
 void entity_remove_randomwalk(struct world* _world, union entity _entity);
 
+#define entity_get_controllable(world, entity) entity_get_component(world, entity, controllable);
+Controllable *entity_add_controllable(struct world* _world, union entity _entity, Controllable data);
+void entity_remove_controllable(struct world* _world, union entity _entity);
+
 #define entity_get_rigidbody(world, entity) entity_get_component(world, entity, rigidbody);
 Rigidbody *entity_add_rigidbody(struct world* _world, union entity _entity, Rigidbody data);
 void entity_remove_rigidbody(struct world* _world, union entity _entity);
@@ -80,6 +89,7 @@ void entity_remove_item(struct world* _world, union entity _entity);
 #define COMPONENTS \
  FLAG(PlayerTag, playertag, COMPONENT_PLAYERTAG)\
  DENSE(RandomWalk, randomwalk, COMPONENT_RANDOMWALK)\
+ DENSE(Controllable, controllable, COMPONENT_CONTROLLABLE)\
  DENSE(Rigidbody, rigidbody, COMPONENT_RIGIDBODY)\
  DENSE(Light, light, COMPONENT_LIGHT)\
  DENSE(SpriteId, spriteid, COMPONENT_SPRITEID)\

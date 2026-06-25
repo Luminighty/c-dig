@@ -21,6 +21,7 @@
 #define GAME_WIDTH  (TILE_PIXEL_SIZE * (64 + 1))
 #define GAME_SIZE   ((GAME_HEIGHT) * (GAME_WIDTH))
 
+#define DEFAULT_PORT 61216
 
 typedef enum {
 	RENDER_LAYER_BACKGROUND,
@@ -42,6 +43,9 @@ extern int UI_SCALE;
 extern Vec2i WINDOW_DIMENSION;
 // Returns the target viewport for the game
 Rect2 game_viewport();
+
+
+extern bool IS_HEADLESS;
 
 
 #endif //  CONFIG_H
