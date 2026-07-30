@@ -36,6 +36,9 @@ void entity_remove_randomwalk(struct world* _world, union entity _entity) {	ENTI
 Controllable *entity_add_controllable(struct world* _world, union entity _entity, Controllable data) {	ENTITY_ADD_DENSE(_world, _entity, controllable, data, COMPONENT_CONTROLLABLE); }
 void entity_remove_controllable(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_CONTROLLABLE); }
 
+NetworkEntity *entity_add_networkentity(struct world* _world, union entity _entity, NetworkEntity data) {	ENTITY_ADD_DENSE(_world, _entity, networkentity, data, COMPONENT_NETWORKENTITY); }
+void entity_remove_networkentity(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_NETWORKENTITY); }
+
 Rigidbody *entity_add_rigidbody(struct world* _world, union entity _entity, Rigidbody data) {	ENTITY_ADD_DENSE(_world, _entity, rigidbody, data, COMPONENT_RIGIDBODY); }
 void entity_remove_rigidbody(struct world* _world, union entity _entity) {	ENTITY_REMOVE(_world, _entity, COMPONENT_RIGIDBODY); }
 

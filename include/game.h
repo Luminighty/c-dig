@@ -12,7 +12,7 @@
 
 typedef struct game {
 	uint64_t tick;
-	World world;
+	World *world;
 	Map *map;
 	PlayerController player;
 	Systems systems;

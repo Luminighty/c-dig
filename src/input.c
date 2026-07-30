@@ -23,7 +23,7 @@ void input_update() {
 	input.mouse_clicked = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
 	input.mouse_held = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
 
-	input.digging = IsKeyDown(KEY_LEFT_SHIFT);
+	input.digging = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
 	input.jump = IsKeyPressed(KEY_SPACE);
 	input.randomize_player = IsKeyPressed(KEY_R);
 
@@ -34,7 +34,7 @@ void input_update() {
 
 static Vec2 input_mouse_to_game() {
 	Vector2 _pos = GetMousePosition();
-	Vec2 pos = {_pos.x, _pos.y};
+	Vec2 pos = {{_pos.x, _pos.y}};
 	Rect2 viewport = game_viewport();
 	pos = vec2_sub(pos, viewport.pos);
 	pos = vec2_div(pos, GAME_SCALE);
@@ -44,7 +44,7 @@ static Vec2 input_mouse_to_game() {
 
 static Vec2 input_mouse_to_ui() {
 	Vector2 _pos = GetMousePosition();
-	Vec2 pos = {_pos.x, _pos.y};
+	Vec2 pos = {{_pos.x, _pos.y}};
 	pos = vec2_div(pos, UI_SCALE);
 	return pos;
 }

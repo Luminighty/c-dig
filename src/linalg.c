@@ -5,8 +5,11 @@
 #include <stddef.h>
 
 
-#define min(a, b) (a < b) ? a : b
-#define max(a, b) (a > b) ? a : b
+#define FLOAT_EPSILON 0.000001
+#define min(a, b) ((a < b) ? a : b)
+#define max(a, b) ((a > b) ? a : b)
+#define abs(a) ((a) < 0 ? -(a) : (a))
+#define float_eq(a, b) ((abs((a) - (b))) <= (FLOAT_EPSILON*max(1.0f, max(abs(a), abs(b)))))
 
 inline float fast_inv_sqrt(float v) {
 	float vhalf = 0.5f * v;
@@ -30,6 +33,10 @@ inline Vec2i vec2i_sub(Vec2i a, Vec2i b) {
 		.x = a.x - b.x,
 		.y = a.y - b.y,
 	});
+}
+inline bool vec2i_eq(Vec2i a, Vec2i b) {
+	return (a.x == b.x && 
+		a.y == b.y);
 }
 inline Vec2i vec2i_scale(Vec2i a, int scale) {
 	return ((Vec2i){
@@ -87,6 +94,11 @@ inline Vec3i vec3i_sub(Vec3i a, Vec3i b) {
 		.y = a.y - b.y,
 		.z = a.z - b.z,
 	});
+}
+inline bool vec3i_eq(Vec3i a, Vec3i b) {
+	return (a.x == b.x && 
+		a.y == b.y && 
+		a.z == b.z);
 }
 inline Vec3i vec3i_scale(Vec3i a, int scale) {
 	return ((Vec3i){
@@ -148,6 +160,10 @@ inline Vec2 vec2_sub(Vec2 a, Vec2 b) {
 		.y = a.y - b.y,
 	});
 }
+inline bool vec2_eq(Vec2 a, Vec2 b) {
+	return (float_eq(a.x, b.x) && 
+		float_eq(a.y, b.y));
+}
 inline Vec2 vec2_scale(Vec2 a, float scale) {
 	return ((Vec2){
 		.x = a.x * scale,
@@ -204,6 +220,11 @@ inline Vec3 vec3_sub(Vec3 a, Vec3 b) {
 		.y = a.y - b.y,
 		.z = a.z - b.z,
 	});
+}
+inline bool vec3_eq(Vec3 a, Vec3 b) {
+	return (float_eq(a.x, b.x) && 
+		float_eq(a.y, b.y) && 
+		float_eq(a.z, b.z));
 }
 inline Vec3 vec3_scale(Vec3 a, float scale) {
 	return ((Vec3){

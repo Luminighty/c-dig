@@ -26,7 +26,7 @@ typedef struct world {
 } World;
 
 
-World world_create();
+World *world_create();
 void world_print(World* world);
 
 Entity entity_create(World* world);

@@ -8,14 +8,16 @@
 #include "entity_id.h"
 #include "tile.h"
 #include "utils.h"
+#include "work.h"
 #include <raylib.h>
 #include <stdbool.h>
 
 
 typedef struct {
-	// Work work;
+	Work work;
 	// Direction target;
 	int speed;
+	Vec2i target;
 	Tile tile;
 } Dig;
 

@@ -18,8 +18,12 @@ local function helpers()
 	if IS_HEADER then
 		return
 	end
-	io.write("#define min(a, b) (a < b) ? a : b\n")
-	io.write("#define max(a, b) (a > b) ? a : b\n\n")
+	io.write("#define FLOAT_EPSILON 0.000001\n")
+	io.write("#define min(a, b) ((a < b) ? a : b)\n")
+	io.write("#define max(a, b) ((a > b) ? a : b)\n")
+	io.write("#define abs(a) ((a) < 0 ? -(a) : (a))\n")
+	io.write("#define float_eq(a, b) ((abs((a) - (b))) <= (FLOAT_EPSILON*max(1.0f, max(abs(a), abs(b)))))\n")
+	io.write("\n")
 end
 
 function Basic()

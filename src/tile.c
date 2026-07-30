@@ -10,8 +10,8 @@ TileData tile_data[TILE_SIZE] = {
 	},
 	[TILE_AIR] = {
 		.texture = TEXTURE_TILE_STONE,
-		.hardness = 16,
-		.flags = 0,
+		.hardness = 0,
+		.flags = TILE_FLAG_UNBREAKABLE,
 		.layer = RENDER_LAYER_BACKGROUND,
 	},
 	[TILE_DIRT] = {

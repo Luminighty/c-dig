@@ -7,6 +7,7 @@
 #include "linalg.h"
 #include "physics.h"
 #include "display.h"
+#include "network_id.h"
 
 typedef struct {} PlayerTag;
 
@@ -19,10 +20,15 @@ typedef struct {
 } Controllable;
 
 typedef struct {
+	NetworkId id;
+	uint32_t owner;
+} NetworkEntity;
+
+typedef struct {
 	ColliderId id;
-	float gravity;
-	bool on_ground;
 	Vec2 velocity;
+	bool on_ground;
+	float gravity;
 } Rigidbody;
 
 typedef struct {
@@ -37,6 +43,7 @@ typedef enum {
 	COMPONENT_PLAYERTAG,
 	COMPONENT_RANDOMWALK,
 	COMPONENT_CONTROLLABLE,
+	COMPONENT_NETWORKENTITY,
 	COMPONENT_RIGIDBODY,
 	COMPONENT_LIGHT,
 	COMPONENT_SPRITEID,
@@ -66,6 +73,10 @@ void entity_remove_randomwalk(struct world* _world, union entity _entity);
 Controllable *entity_add_controllable(struct world* _world, union entity _entity, Controllable data);
 void entity_remove_controllable(struct world* _world, union entity _entity);
 
+#define entity_get_networkentity(world, entity) entity_get_component(world, entity, networkentity);
+NetworkEntity *entity_add_networkentity(struct world* _world, union entity _entity, NetworkEntity data);
+void entity_remove_networkentity(struct world* _world, union entity _entity);
+
 #define entity_get_rigidbody(world, entity) entity_get_component(world, entity, rigidbody);
 Rigidbody *entity_add_rigidbody(struct world* _world, union entity _entity, Rigidbody data);
 void entity_remove_rigidbody(struct world* _world, union entity _entity);
@@ -90,6 +101,7 @@ void entity_remove_item(struct world* _world, union entity _entity);
  FLAG(PlayerTag, playertag, COMPONENT_PLAYERTAG)\
  DENSE(RandomWalk, randomwalk, COMPONENT_RANDOMWALK)\
  DENSE(Controllable, controllable, COMPONENT_CONTROLLABLE)\
+ DENSE(NetworkEntity, networkentity, COMPONENT_NETWORKENTITY)\
  DENSE(Rigidbody, rigidbody, COMPONENT_RIGIDBODY)\
  DENSE(Light, light, COMPONENT_LIGHT)\
  DENSE(SpriteId, spriteid, COMPONENT_SPRITEID)\

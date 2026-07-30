@@ -2,15 +2,16 @@
 #include "component_storage.h"
 #include "components.h"
 #include <assert.h>
+#include <stdlib.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
 
-World world_create() {
-	World w = {0};
-	w.entities.size = 1;
+World *world_create() {
+	World *w = malloc(sizeof(World));
+	w->entities.size = 1;
 	return w;
 }
 
@@ -79,7 +80,7 @@ bool entity_has_components(World* world, Entity entity, ComponentBitmap componen
 #define print_component(name, component_tag) if (entity_has_component(world, entity, component_tag)) printf(#name ", ");
 void world_print(World *world) {
 	foreach_entity(world, entity, ((ComponentBitmap){0})) {
-		printf("Entity %d: compbyte: %d",
+		printf("Entity %d: compbyte: %lu",
 			entity.as.index, 
 			world->entities.component_map[entity.as.index].bytes[0]
 		);

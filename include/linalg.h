@@ -16,6 +16,7 @@ typedef union {
 
 Vec2i vec2i_add(Vec2i a, Vec2i b);
 Vec2i vec2i_sub(Vec2i a, Vec2i b);
+bool vec2i_eq(Vec2i a, Vec2i b);
 Vec2i vec2i_scale(Vec2i a, int scale);
 Vec2i vec2i_div(Vec2i a, int scale);
 int vec2i_dot(Vec2i a, Vec2i b);
@@ -40,6 +41,7 @@ typedef union {
 
 Vec3i vec3i_add(Vec3i a, Vec3i b);
 Vec3i vec3i_sub(Vec3i a, Vec3i b);
+bool vec3i_eq(Vec3i a, Vec3i b);
 Vec3i vec3i_scale(Vec3i a, int scale);
 Vec3i vec3i_div(Vec3i a, int scale);
 int vec3i_dot(Vec3i a, Vec3i b);
@@ -64,6 +66,7 @@ typedef union {
 
 Vec2 vec2_add(Vec2 a, Vec2 b);
 Vec2 vec2_sub(Vec2 a, Vec2 b);
+bool vec2_eq(Vec2 a, Vec2 b);
 Vec2 vec2_scale(Vec2 a, float scale);
 Vec2 vec2_div(Vec2 a, float scale);
 float vec2_dot(Vec2 a, Vec2 b);
@@ -88,6 +91,7 @@ typedef union {
 
 Vec3 vec3_add(Vec3 a, Vec3 b);
 Vec3 vec3_sub(Vec3 a, Vec3 b);
+bool vec3_eq(Vec3 a, Vec3 b);
 Vec3 vec3_scale(Vec3 a, float scale);
 Vec3 vec3_div(Vec3 a, float scale);
 float vec3_dot(Vec3 a, Vec3 b);

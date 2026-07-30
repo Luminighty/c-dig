@@ -1,0 +1,9 @@
+#include "work.h"
+
+
+const char* WORK_STATUS_LABELS[WORK_STATUS__SIZE] = {
+	[WORK_STATUS_NONE] = "NONE",
+	[WORK_STATUS_ACTIVE] = "ACTIVE",
+	[WORK_STATUS_FINISHED] = "FINISHED",
+};
+

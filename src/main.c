@@ -13,12 +13,12 @@ static void main_client() {
 	InitWindow(WINDOW_DIMENSION.x, WINDOW_DIMENSION.y, WINDOW_TITLE);
 	SetTargetFPS(60);
 
-	game_client_init();
+	// game_client_init();
 	game_init();
 	
 	while (!WindowShouldClose()) {
 		game_update();
-		game_client_update();
+		// game_client_update();
 
 		BeginDrawing();
 		ClearBackground(BLACK);
@@ -29,7 +29,7 @@ static void main_client() {
 		fflush(stderr);
 	}
 	game_destroy();
-	game_client_destroy();
+	// game_client_destroy();
 }
 
 

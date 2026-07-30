@@ -16,6 +16,28 @@ local function vector_typedef(vector)
 	io.write(string.format("} %s;\n\n", vector.name))
 end
 
+local function vector_eq(vector, op)
+	FunctionBegin("bool", vector.prefix .. "_eq", vector.name .. " a", vector.name .. " b")
+	if IS_HEADER then
+		return
+	end
+	local eq_map = {
+		int = "a.%s == b.%s",
+		float = "float_eq(a.%s, b.%s)"
+	}
+	local eq_fn = eq_map[vector.component]
+
+	local fields = {}
+	for i = 1, vector.dimension do
+		local field = component_names[i]
+		table.insert(fields, string.format(eq_fn, field, field, op, field))
+	end
+	io.write(string.format(
+		"\treturn (%s);\n}\n",
+		table.concat(fields, " && \n\t\t")
+	))
+end
+
 local function vector_op(vector, method_name, op)
 	FunctionBegin(vector.name, vector.prefix .. "_" .. method_name, vector.name .. " a", vector.name .. " b")
 	if IS_HEADER then
@@ -161,6 +183,7 @@ function Vector(vector)
 	vector_typedef(vector)
 	vector_op(vector, "add", "+")
 	vector_op(vector, "sub", "-")
+	vector_eq(vector)
 	vector_scale(vector)
 	vector_div(vector)
 	vector_dot(vector)

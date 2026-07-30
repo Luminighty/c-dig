@@ -12,8 +12,10 @@ local function print_typedef(component)
 		io.write("struct {}")
 	elseif component.fields ~= nil then
 		io.write("struct {\n")
-		for key, value in pairs(component.fields) do
-			io.write("\t", value, " ", key, ";\n")
+		for _, pair in ipairs(component.fields) do
+			local field = pair[1]
+			local type = pair[2]
+			io.write("\t", type, " ", field, ";\n")
 		end
 		io.write("}")
 	elseif component.actual_type then

@@ -44,15 +44,15 @@ void game_init() {
 	game.world = world_create();
 
 	// int player_y = MAP_HEIGHT / 2;
-	// game.player = player_create(&game.world, MAP_WIDTH / 2, player_y);
+	// game.player = player_create(game.world, MAP_WIDTH / 2, player_y);
 
 	Vec2i spawn_tile = {.x = MAP_WIDTH / 2, .y = MAP_HEIGHT / 2 };
-	game.player = player_create(&game.world, tile_to_world_coord(spawn_tile));
+	game.player = player_create(game.world, tile_to_world_coord(spawn_tile));
 
-	game.other_player = entity_create_miner(&game.world, vec2_add(tile_to_world_coord(spawn_tile), (Vec2){.x = 10 }));
-	game.chest = entity_create_furniture(&game.world, spawn_tile, TEXTURE_FURNITURE_CHEST);
+	game.other_player = entity_create_miner(game.world, vec2_add(tile_to_world_coord(spawn_tile), (Vec2){.x = 10 }));
+	game.chest = entity_create_furniture(game.world, spawn_tile, TEXTURE_FURNITURE_CHEST);
 
-	systems_fire_init(&game.systems, &game.world);
+	systems_fire_init(&game.systems, game.world);
 }
 
 
@@ -76,7 +76,7 @@ void game_draw() {
 	};
 	player_render(&game, &game.player);
 
-	systems_fire_draw(&game.systems, &game.world);
+	systems_fire_draw(&game.systems, game.world);
 
 
 	input.ui_hovering = false;
@@ -109,7 +109,7 @@ void game_update() {
 		input.mouse_clicked = false;
 	}
 	player_update(&game, &game.player);
-	systems_fire_update(&game.systems, &game.world);
+	systems_fire_update(&game.systems, game.world);
 	map_update_light(game.map);
 
 

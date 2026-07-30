@@ -14,7 +14,10 @@
 #include "random.h"
 #include "tile.h"
 #include "debug.h"
+#include "work.h"
 #include <assert.h>
+#include <stdio.h>
+#include <stdint.h>
 
 
 static inline PlayerToolSlot *add_tool(PlayerController *player, PlayerToolKind kind, int amount) {
@@ -67,8 +70,8 @@ static void randomize_sprite(PlayerController* player) {
 
 
 static inline void player_movement(Game *game, PlayerController* player) {
-	if (entity_has_component(&game->world, player->entity, COMPONENT_RIGIDBODY)) {
-		Rigidbody *rb = entity_get_rigidbody(&game->world, player->entity);
+	if (entity_has_component(game->world, player->entity, COMPONENT_RIGIDBODY)) {
+		Rigidbody *rb = entity_get_rigidbody(game->world, player->entity);
 		if (input.jump && rb->on_ground) {
 			rb->velocity.y = -2;
 			rb->on_ground = false;
@@ -77,43 +80,64 @@ static inline void player_movement(Game *game, PlayerController* player) {
 		return;
 	}
 	// NOTE: Fallback in case the entity does not have a rigidbody
-	Position *pos = entity_get_position(&game->world, player->entity);
+	Position *pos = entity_get_position(game->world, player->entity);
 	*pos = vec2_add(*pos, vec2_scale(input.movement, player->movement.speed));
 }
 
 
-// static inline void player_dig(Player* player) {
-// 	if (!input.digging) {
-// 		player->dig.target = 0;
-// 		return;
-// 	}
-// 	Direction dir = vec2_into_dir(input.movement);
-// 	if (!dir)
-// 		return;
-//
-// 	Work* work = &player->dig.work;
-// 	if (dir != player->dig.target || work_is_inactive(work)) {
-// 		Vec2 tile_pos = vec2_add(player->position, dir_into_vec2(dir));
-// 		Tile tile = map_get(game.map, tile_pos.x, tile_pos.y);
-// 		player->dig.tile = tile;
-// 		player->dig.target = dir;
-// 		work_start(work, 100 + 200 * tile_get_hardness(tile));
-// 	}
-//
-// 	WorkUnit progress = player->dig.speed;
-// 	if (tile_is_unbreakable(player->dig.tile))
-// 		progress = 0;
-// 	if (!work_progress(work, progress))
-// 		return;
-// 	printf("DONE\n");
-// 	work_print(work); printf("\n");
-// 	MaterialComposition composition = get_tile_composition(player->dig.tile);
-// 	material_composition_merge_into(&player->bag, &composition);
-// 	material_composition_print(&player->bag);
-// 	work_reset(work);
-// 	Vec2 tile_pos = vec2_add(player->position, dir_into_vec2(dir));
-// 	map_set(game.map, tile_pos.x, tile_pos.y, TILE_AIR);
-// }
+static inline uint32_t dig_total_hardness(Game *game, Vec2i target) {
+	static const int BRUSH_SIZE = 1;
+	uint32_t sum = 0;
+	for (int i = -BRUSH_SIZE; i <= BRUSH_SIZE; i++) {
+	for (int j = -BRUSH_SIZE; j <= BRUSH_SIZE; j++) {
+		int x = target.x + i;
+		int y = target.y + j;
+		Tile tile = map_get(game->map, x, y);
+		if (tile_is_unbreakable(tile))
+			continue;
+		sum += tile_hardness(tile);
+	}}
+	return sum;
+}
+
+static inline void player_dig(Game *game, PlayerController* player, Vec2i target) {
+	if (!input.digging) {
+		return;
+	}
+
+	Work* work = &player->dig.work;
+	if (!vec2i_eq(target, player->dig.target) || work_is_inactive(work)) {
+		player->dig.target = target;
+		uint32_t hardness = dig_total_hardness(game, target);
+		if (hardness == 0) {
+			return;
+		}
+		work_start(work, 10 * hardness);
+		// printf(WORK_FMT"\n", WORK_ARG(*work));
+	}
+
+	WorkUnit progress = player->dig.speed;
+	if (tile_is_unbreakable(player->dig.tile))
+		progress = 0;
+	if (!work_progress(work, progress))
+		return;
+
+	// printf(WORK_FMT"\n", WORK_ARG(*work));
+	// MaterialComposition composition = get_tile_composition(player->dig.tile);
+	// material_composition_merge_into(&player->bag, &composition);
+	// material_composition_print(&player->bag);
+	work_reset(work);
+	static const int BRUSH_SIZE = 1;
+	for (int i = -BRUSH_SIZE; i <= BRUSH_SIZE; i++) {
+	for (int j = -BRUSH_SIZE; j <= BRUSH_SIZE; j++) {
+		int x = target.x + i;
+		int y = target.y + j;
+		Tile tile = map_get(game->map, x, y);
+		if (tile_is_unbreakable(tile))
+			continue;
+		map_set(game->map, x, y, TILE_AIR);
+	}}
+}
 
 
 static inline Vec2i current_mouse_tile() {
@@ -138,7 +162,7 @@ static inline void player_build(Game *game, Tile tile) {
 
 
 // TODO: This is getting really bad, help
-static inline void player_use(Game *game, PlayerToolSlot *slot) {
+static inline void player_use(Game *game, PlayerController *player, PlayerToolSlot *slot) {
 	if (slot->amount <= 0 && !slot->unlimited)
 		return;
 	if (!slot->unlimited && input.mouse_clicked)
@@ -149,7 +173,8 @@ static inline void player_use(Game *game, PlayerToolSlot *slot) {
 	switch (slot->kind) {
 	case PLAYER_TOOL_NONE: break;
 	case PLAYER_TOOL_PICKAXE:
-		player_build(game, TILE_AIR); break;
+		// player_dig(player, tile);
+		break;
 	case PLAYER_TOOL_WOOD:
 		player_build(game, TILE_WOOD);
 		break;
@@ -158,27 +183,27 @@ static inline void player_use(Game *game, PlayerToolSlot *slot) {
 		break;
 	case PLAYER_TOOL_TORCH: {
 		if (input.mouse_clicked)
-			entity_create_torch(&game->world, tile, 16);
+			entity_create_torch(game->world, tile, 16);
 	} break;
 	case PLAYER_TOOL_CHEST:
 		if (input.mouse_clicked)
-		entity_create_furniture(&game->world, tile, TEXTURE_FURNITURE_CHEST);
+		entity_create_furniture(game->world, tile, TEXTURE_FURNITURE_CHEST);
 		break;
 	case PLAYER_TOOL_FURNACE:
 		if (input.mouse_clicked)
-		entity_create_furniture(&game->world, tile, TEXTURE_FURNITURE_FURNACE);
+		entity_create_furniture(game->world, tile, TEXTURE_FURNITURE_FURNACE);
 		break;
 	case PLAYER_TOOL_WORKBENCH:
 		if (input.mouse_clicked)
-		entity_create_furniture(&game->world, tile, TEXTURE_FURNITURE_WORKBENCH);
+		entity_create_furniture(game->world, tile, TEXTURE_FURNITURE_WORKBENCH);
 		break;
 	case PLAYER_TOOL_ANVIL:
 		if (input.mouse_clicked)
-		entity_create_furniture(&game->world, tile, TEXTURE_FURNITURE_ANVIL);
+		entity_create_furniture(game->world, tile, TEXTURE_FURNITURE_ANVIL);
 		break;
 	case PLAYER_TOOL_LADDER:
 		if (input.mouse_clicked)
-		entity_create_furniture(&game->world, tile, TEXTURE_FURNITURE_LADDER);
+		entity_create_furniture(game->world, tile, TEXTURE_FURNITURE_LADDER);
 		break;
 	}
 }
@@ -187,7 +212,7 @@ static inline void player_use(Game *game, PlayerToolSlot *slot) {
 
 void player_update(Game *game, PlayerController* player) {
 	player_movement(game, player);
-	// player_dig(player);
+	player_dig(game, player, current_mouse_tile());
 	if (input.randomize_player) {
 		Entity temp = player->entity;
 		player->entity = game->chest;
@@ -204,12 +229,12 @@ void player_update(Game *game, PlayerController* player) {
 	int current_facing = player->is_facing_right ? 1 : -1;
 	if (current_facing * input.movement.x < 0) {
 		player->is_facing_right = input.movement.x > 0;
-		SpriteId *sprite = entity_get_spriteid(&game->world, player->entity);
+		SpriteId *sprite = entity_get_spriteid(game->world, player->entity);
 		sprite_set_flip_x(*sprite, !player->is_facing_right);
 	}
 	
 	if (input.mouse_clicked || input.mouse_held) {
-		player_use(game, &player->tools[player->current_tool]);
+		player_use(game, player, &player->tools[player->current_tool]);
 	}
 }
 
@@ -217,7 +242,7 @@ void player_update(Game *game, PlayerController* player) {
 void player_render(Game *game, PlayerController* player) {
 	static const Vec2 CENTER = {.x = GAME_WIDTH / 2.0, .y = GAME_HEIGHT / 2.0 };
 
-	Position *pos = entity_get_position(&game->world, player->entity);
+	Position *pos = entity_get_position(game->world, player->entity);
 
 	camera_set_position(vec2_sub(*pos, CENTER));
 	// sprite_set_position(player->sprite, *position);
