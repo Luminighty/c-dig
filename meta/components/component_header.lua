@@ -31,7 +31,7 @@ local function print_component_enum(components)
 	for _, value in ipairs(components) do
 		io.write("\tCOMPONENT_", string.upper(value.class_name), ",\n")
 	end
-	io.write("\tCOMPONENT_SIZE,\n")
+	io.write("\tCOMPONENT__SIZE,\n")
 	io.write("} ComponentType;\n\n")
 end
 
@@ -64,7 +64,7 @@ end
 local function generate_bitmap()
 	io.write("#define COMPONENTBITMAP_SLOTSIZE 64\n")
 	io.write("typedef struct {\n")
-	io.write("\tuint64_t bytes[(COMPONENT_SIZE / COMPONENTBITMAP_SLOTSIZE) + 1];\n")
+	io.write("\tuint64_t bytes[(COMPONENT__SIZE / COMPONENTBITMAP_SLOTSIZE) + 1];\n")
 	io.write("} ComponentBitmap;\n")
 	io.write("#define COMPONENT_TO_SLOTBIT(component) (1ULL << (component % COMPONENTBITMAP_SLOTSIZE))\n")
 	io.write("\n")

@@ -1,3 +1,5 @@
+require("meta.tiles.registry")
+
 local HEADER_GUARD = "TILE_H"
 local file = "tile"
 local header_file = file .. ".h"
@@ -5,11 +7,11 @@ local source_file = file .. ".c"
 
 local function generate_enum(tiles)
 	io.write("typedef enum {\n")
-	io.write("\tTILE_NONE,\n")
+	io.write("\tTILE__NONE,\n")
 	for _, tile in ipairs(tiles) do
 		io.write(string.format("\tTILE_%s,\n", string.upper(tile.id)))
 	end
-	io.write("\tTILE_SIZE,\n")
+	io.write("\tTILE__SIZE,\n")
 	io.write("} Tile;\n")
 end
 
@@ -21,7 +23,7 @@ local function header(tiles)
 
 	generate_enum(tiles)
 	io.write("\n")
-	io.write("extern TileData tile_data[TILE_SIZE];\n")
+	io.write("extern TileData tile_data[TILE__SIZE];\n")
 	io.write("\n")
 
 	HeaderGuardEnd(HEADER_GUARD)
@@ -44,10 +46,22 @@ local function tile_flags(tile)
 	return table.concat(flags, " | ")
 end
 
+local function tile_composition(tile)
+	local items = {}
+	for _, comp in ipairs(tile.composition) do
+		local mineral = "MINERAL_" .. string.upper(comp[1])
+		local amount = comp[2]
+		local fmt = "{ .mineral = %s, .amount = %d }"
+		table.insert(items, fmt:format(mineral, amount))
+	end
+	if #items == 0 then return "{}" end
+	return "{\n\t\t\t" .. table.concat(items, ",\n\t\t\t") .. "\n\t\t}"
+end
+
 local function source(tiles)
 	SourceBegin(header_file)
 	io.write("\n")
-	io.write("TileData tile_data[TILE_SIZE] = {\n")
+	io.write("TileData tile_data[TILE__SIZE] = {\n")
 
 	for _, tile in ipairs(tiles) do
 		io.write("\t[TILE_" .. string.upper(tile.id) .. "] = {\n")
@@ -56,6 +70,7 @@ local function source(tiles)
 		io.write("\t\t.hardness = " .. tile.hardness .. ",\n")
 		io.write("\t\t.flags = " .. tile_flags(tile) .. ",\n")
 		io.write("\t\t.layer = " .. tile.layer .. ",\n")
+		io.write("\t\t.composition = " .. tile_composition(tile) .. ",\n")
 
 		io.write("\t},\n")
 	end

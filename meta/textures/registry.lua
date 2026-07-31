@@ -10,6 +10,8 @@ local generated_textures = {}
 local texture_ids = {}
 local templates = {}
 
+TEXTURE_NONE = "_NONE"
+
 function TextureTemplate(id, file, colors)
 	assert(templates[id] == nil, "Template '", id, "' already defined.")
 	templates[id] = {

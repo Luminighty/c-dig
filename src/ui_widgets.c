@@ -151,3 +151,4 @@ void ui_texture(TextureId texture, Rect2i rectangle) {
 		to_rayrect(rectangle), (Vector2){0, 0}, 0, WHITE
 	);
 }
+

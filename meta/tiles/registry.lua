@@ -15,7 +15,7 @@ RenderLayer = {
 }
 
 function Tile(id, props)
-	assert(reserved[id] == nil, "Tile '" .. id .. "' is reserved.")
+	assert(reserved[string.lower(id)] == nil, "Tile '" .. id .. "' is a reserved keyword.")
 	assert(tile_ids[id] == nil, "Tile '" .. id .. "' already defined.")
 	tile_ids[id] = true
 	props = props or {}
@@ -24,8 +24,10 @@ function Tile(id, props)
 		texture = props.texture or ("TILE_" .. id),
 		layer = props.layer or RenderLayer.NORMAL,
 		hardness = props.hardness or 16,
+		composition = props.composition or {},
 		is_solid = Default(props.is_solid, true),
 		is_opaque = Default(props.is_opaque, true),
 		is_unbreakable = Default(props.is_unbreakable, false),
 	})
 end
+

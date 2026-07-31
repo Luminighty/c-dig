@@ -3,6 +3,7 @@
 
 
 #include "linalg.h"
+#include "mineral.h"
 #include "physics.h"
 #include "display.h"
 #include "entity_id.h"
@@ -33,7 +34,7 @@ typedef enum {
 	PLAYER_SPRITE_SLOT_CLOTH,
 	PLAYER_SPRITE_SLOT_BEARD,
 	PLAYER_SPRITE_SLOT_HAT,
-	PLAYER_SPRITE_SLOT_SIZE,
+	PLAYER_SPRITE_SLOT__SIZE,
 } PlayerSpriteSlot;
 
 
@@ -58,13 +59,21 @@ typedef struct {
 } PlayerToolSlot;
 
 
+typedef struct {
+	uint32_t size;
+	uint16_t amount[MINERAL__SIZE];
+} PlayerBag;
+
+
 #define PLAYER_TOOLBAR_SIZE 4
+
 
 typedef struct {
 	Entity entity;
 	Movement movement;
 	Dig dig;
 	PlayerToolSlot tools[PLAYER_TOOLBAR_SIZE];
+	PlayerBag bag;
 	int current_tool;
 	int tools_count;
 	bool is_facing_right;
@@ -76,6 +85,6 @@ struct game;
 PlayerController player_create(struct world *world, Vec2 position);
 void player_update(struct game *game, PlayerController* player);
 void player_render(struct game *game, PlayerController* player);
-
+void player_render_interaction(struct game *game, PlayerController* player);
 
 #endif // PLAYER_H

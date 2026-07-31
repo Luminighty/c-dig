@@ -8,7 +8,7 @@
 typedef uint32_t WorkUnit;
 
 typedef enum {
-	WORK_STATUS_NONE,
+	WORK_STATUS__NONE,
 	WORK_STATUS_ACTIVE,
 	WORK_STATUS_FINISHED,
 	WORK_STATUS__SIZE,
@@ -34,7 +34,7 @@ static inline void work_start(Work* work, WorkUnit work_amount) {
 }
 
 
-static inline bool work_progress(Work* work, WorkUnit progress) {
+static inline bool work_step(Work* work, WorkUnit progress) {
 	if (work->status != WORK_STATUS_ACTIVE)
 		return false;
 	if (work->remaining <= progress) {
@@ -49,23 +49,27 @@ static inline bool work_progress(Work* work, WorkUnit progress) {
 
 // NOTE: Consider adding finish/abort if you need to know the difference as a state
 static inline void work_reset(Work* work) {
-	work->status = WORK_STATUS_NONE;
+	work->status = WORK_STATUS__NONE;
 }
 
-// Resets the work if it's invalid
-#define work_validate(work, is_valid) if (!(is_valid)) work_reset(work)
-#define work_is_inactive(work) ((work)->status != WORK_STATUS_ACTIVE)
+#define work_is_inactive(work) ((work).status != WORK_STATUS_ACTIVE)
+#define work_is_active(work) ((work).status == WORK_STATUS_ACTIVE)
 
-// Returns true if the work has been finished
+// Resets the work if it's invalid
+static inline void work_validate(Work* work, bool is_valid) {
+	if (!(is_valid)) work_reset(work);
+}
+
+// Returns true if the work has been finished, then resets itself
 static inline bool work_full_update(Work* work, bool precondition, WorkUnit total, WorkUnit progress) {
-	if (work_is_inactive(work)) {
+	if (work_is_inactive(*work)) {
 		if (precondition) {
 			work_start(work, total);
 		} else {
 			return false;
 		}
 	}
-	if (!work_progress(work, progress)) {
+	if (!work_step(work, progress)) {
 		work_validate(work, precondition);
 		return false;
 	}

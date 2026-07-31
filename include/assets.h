@@ -6,7 +6,7 @@
 
 
 typedef struct {
-	Texture2D textures[TEXTURE_SIZE];
+	Texture2D textures[TEXTURE__SIZE];
 } AssetServer;
 
 

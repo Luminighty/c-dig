@@ -20,14 +20,21 @@
 		map->tiles[y][x] = tile;
 
 
+static const Tile ORES[] = {
+	TILE_DIAMOND,
+	TILE_IRON, TILE_IRON,
+	TILE_COAL, TILE_COAL,
+	TILE_COAL, TILE_COAL,
+	TILE_GOLD, TILE_URANIUM,
+	TILE_COPPER, TILE_COPPER,
+};
+
 static Tile generate_tile(int x, int y) {
 	int val = rand() % 100;
-	if (val > 98)
-		return TILE_DIAMOND;
-	if (val > 95)
-		return TILE_IRON;
-	if (val > 90)
-		return TILE_COAL;
+	if (val > 60) {
+		int idx = rand() % sizeof(ORES) / sizeof(ORES[0]);
+		return ORES[idx];
+	}
 	if (val > 10)
 		return TILE_STONE;
 	return TILE_DIRT;

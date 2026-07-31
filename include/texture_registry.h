@@ -39,9 +39,11 @@
 	TEXTURE(MINER_HAT_0005, "./assets/textures/miner/hat/0005.png")\
 	TEXTURE(TILE_AMETHYST, "./assets/textures/tile/amethyst.png")\
 	TEXTURE(TILE_COAL, "./assets/textures/tile/coal.png")\
+	TEXTURE(TILE_COPPER, "./assets/textures/tile/copper.png")\
 	TEXTURE(TILE_DIAMOND, "./assets/textures/tile/diamond.png")\
 	TEXTURE(TILE_DIRT, "./assets/textures/tile/dirt.png")\
 	TEXTURE(TILE_EMERALD, "./assets/textures/tile/emerald.png")\
+	TEXTURE(TILE_GOLD, "./assets/textures/tile/gold.png")\
 	TEXTURE(TILE_GRASS, "./assets/textures/tile/grass.png")\
 	TEXTURE(TILE_IRON, "./assets/textures/tile/iron.png")\
 	TEXTURE(TILE_MOSS, "./assets/textures/tile/moss.png")\
@@ -57,13 +59,13 @@
 
 
 typedef enum {
-	TEXTURE_NONE,
+	TEXTURE__NONE,
 
 	#define TEXTURE(id, _) TEXTURE_##id,
 	REGISTRY_TEXTURES
 	#undef TEXTURE
 
-	TEXTURE_SIZE,
+	TEXTURE__SIZE,
 } TextureId;
 
 #endif // TEXTURE_REGISTRY

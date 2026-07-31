@@ -1,5 +1,6 @@
 #include "display.h"
 #include "assets.h"
+#include "player.h"
 #include "texture_registry.h"
 #include "config.h"
 #include "game.h"
@@ -69,7 +70,7 @@ static void map_render(RenderLayer layer) {
 			continue;
 
 		TextureId texture_id = tile_texture(tile);
-		if (texture_id == TEXTURE_NONE)
+		if (texture_id == TEXTURE__NONE)
 			continue;
 
 		Color color = WHITE;
@@ -117,10 +118,22 @@ static inline SpriteSettings get_global_settings(Sprite *sprite) {
 }
 
 
+static inline void world_render();
 void display_render() {
 	camera.target.x = display.camera.x;
 	camera.target.y = display.camera.y;
 	BeginMode2D(camera);
+	world_render();
+
+	player_render_interaction(&game, &game.player);
+	light_render();
+	
+	physics_render();
+	EndMode2D();
+}
+
+
+static inline void world_render() {
 	RenderLayer layer = RENDER_LAYER_BACKGROUND;
 	for (size_t i = 1; i < display.sprite_count; i++) {
 		SpriteId id = display.sorted[i];
@@ -153,9 +166,6 @@ void display_render() {
 	}
 	while (layer < RENDER_LAYER_SIZE)
 		map_render(layer++);
-	light_render();
-	physics_render();
-	EndMode2D();
 }
 
 

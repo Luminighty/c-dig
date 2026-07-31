@@ -21,7 +21,7 @@
 
 
 Tile map_get(Map* map, int x, int y) {
-	return is_inside_map(x, y) ? map->tiles[y][x] : TILE_NONE;
+	return is_inside_map(x, y) ? map->tiles[y][x] : TILE__NONE;
 }
 
 void map_set(Map* map, int x, int y, Tile tile) {

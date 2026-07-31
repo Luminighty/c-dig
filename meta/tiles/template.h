@@ -2,6 +2,8 @@
 #include "config.h"
 #include <assert.h>
 #include <stdint.h>
+#include "mineral.h"
+
 
 
 typedef enum {
@@ -10,12 +12,19 @@ typedef enum {
 	TILE_FLAG_UNBREAKABLE = 1 << 2,
 } TileFlag;
 
+#define TILE_COMPOSITION_MAX 8
+
+typedef struct {
+	Mineral mineral;
+	uint16_t amount;
+} TileComposition;
 
 typedef struct {
 	TextureId texture;
 	uint8_t hardness;
 	TileFlag flags;
 	RenderLayer layer;
+	TileComposition composition[TILE_COMPOSITION_MAX];
 } TileData;
 
 

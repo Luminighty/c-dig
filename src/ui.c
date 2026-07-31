@@ -1,6 +1,7 @@
 #include "ui.h"
 #include "game.h"
 #include "linalg.h"
+#include "mineral.h"
 #include "player.h"
 #include "texture_registry.h"
 #include "ui_widgets.h"
@@ -41,7 +42,12 @@ typedef struct {
 static Window smelter_window = {
 	.visible = true,
 	.title = "Dummy-D",
-	.rectangle = {100, 100, 120, 100}
+	.rectangle = {.x = 100, .y = 100, .w = 120, .h = 100}
+};
+static Window bag_window = {
+	.visible = true,
+	.title = "Bag",
+	.rectangle = {.x = 250, .y = 100, .w = 240, .h = 50}
 };
 static DummySmelter smelter = { .enabled = false, .power = 100};
 static void dummy_windows();
@@ -114,8 +120,46 @@ void smelter_ui(DummySmelter *smelter, Window *window) {
 	if (stop_pressed) smelter->enabled = false;
 }
 
+static inline Color to_raylib_color(uint32_t color) {
+	return (Color) {
+		.r = (color & 0xFF0000) >> 16,
+		.g = (color & 0x00FF00) >> 8,
+		.b = (color & 0x0000FF) >> 0,
+		.a = 0xFF,
+	};
+}
+
+void bag_ui(PlayerBag *bag, Window *window) {
+	if (!window->visible)
+		return;
+	ui_window(window);
+	UIContext context = window_context(window);
+
+	int width = window->rectangle.w - 16;
+	DrawRectangle(
+		context.head.x, context.head.y, 
+		width, 18,
+		GetColor(0x222222)
+	);
+	width -= 2;
+	int x = context.head.x + 1;
+	for (int i = 0; i < MINERAL__SIZE; i++) {
+		uint16_t amount = bag->amount[i];
+		float percentage = (float)amount / (float)bag->size;
+		int w = width * percentage;
+
+		DrawRectangle(
+			x, context.head.y + 1,
+			w, 16,
+			to_raylib_color(mineral_color(i))
+		);
+		x += w;
+	}
+}
+
 static void dummy_windows() {
 	smelter_ui(&smelter, &smelter_window);
+	bag_ui(&game.player.bag, &bag_window);
 }
 //
 //

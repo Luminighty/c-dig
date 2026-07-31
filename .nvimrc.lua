@@ -6,3 +6,5 @@ vim.keymap.set("n", "<leader>bB", "<cmd>!make clean && bear -- make -j8<CR>", { 
 vim.keymap.set("n", "<leader>br", "<cmd>!make clean && make release<CR>", { desc = "Release build" })
 vim.keymap.set("n", "<leader>bc", "<cmd>!make clean<CR>", { desc = "Clean" })
 vim.keymap.set("n", "<leader>bm", "<cmd>!lua ./meta/generate.lua<CR>", { desc = "Meta" })
+
+vim.keymap.set("n", "<leader>bMt", "<cmd>!./meta/textures/build.sh && ./meta/textures/generator<CR>", { desc = "Texture generator" })

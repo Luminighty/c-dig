@@ -11,3 +11,4 @@ else
 fi
 
 gcc -o ./meta/textures/generator ./meta/textures/main.c $LDFLAGS $TARGET_FLAGS
+

@@ -49,7 +49,7 @@ typedef enum {
 	COMPONENT_SPRITEID,
 	COMPONENT_POSITION,
 	COMPONENT_ITEM,
-	COMPONENT_SIZE,
+	COMPONENT__SIZE,
 } ComponentType;
 
 #define entity_get_component(world, entity, COMPONENT) (\
@@ -110,7 +110,7 @@ void entity_remove_item(struct world* _world, union entity _entity);
 
 #define COMPONENTBITMAP_SLOTSIZE 64
 typedef struct {
-	uint64_t bytes[(COMPONENT_SIZE / COMPONENTBITMAP_SLOTSIZE) + 1];
+	uint64_t bytes[(COMPONENT__SIZE / COMPONENTBITMAP_SLOTSIZE) + 1];
 } ComponentBitmap;
 #define COMPONENT_TO_SLOTBIT(component) (1ULL << (component % COMPONENTBITMAP_SLOTSIZE))
 

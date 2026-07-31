@@ -44,8 +44,11 @@ void interactive() {
 		BeginDrawing();
 		ClearBackground(BLACK);
 
-		GuiColorPickerHSV((Rectangle){ 10, 10, 100, 100}, "Color", &new_main_hsv);
+		GuiColorPickerHSV((Rectangle){ 5, 5, 100, 100}, "Color", &new_main_hsv);
 		Color new_main = ColorFromHSV(new_main_hsv.x, new_main_hsv.y, new_main_hsv.z);
+		if (GuiButton((Rectangle){ 130, 5, 150, 20 }, "copy to clipboard")) {
+			SetClipboardText(TextFormat("0x%X%X%X", new_main.r, new_main.g, new_main.b));
+		}
 
 		if (!ColorIsEqual(previous_main, new_main)) {
 			palette_ore(&palette, new_main);

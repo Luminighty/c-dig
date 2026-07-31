@@ -75,7 +75,6 @@ void game_draw() {
 		.width = _GAME_TARGET.w, .height = _GAME_TARGET.h,
 	};
 	player_render(&game, &game.player);
-
 	systems_fire_draw(&game.systems, game.world);
 
 

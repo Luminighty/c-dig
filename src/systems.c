@@ -33,7 +33,7 @@ static void random_walk_system(World *world) {
 		RandomWalk *randomwalk = entity_get_randomwalk(world, entity);
 		Vec2 delta = vec2_sub(randomwalk->target, *position);
 		if (fabsf(delta.x) > 1.0f || fabsf(delta.y) > 1.0f) {
-			Vec2 move = vec2_scale(vec2_normalize(delta), 0.2f);
+			Vec2 move = vec2_scale(vec2_normalize(delta), 0.05f);
 			*position = vec2_add(*position, move);
 			// printf("%f,%f\n", position->x, position->y);
 			continue;

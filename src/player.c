@@ -1,6 +1,7 @@
 #include "player.h"
 #include "entity_id.h"
 #include "entity_prefabs.h"
+#include "mineral.h"
 #include "texture_registry.h"
 #include "components.h"
 #include "physics.h"
@@ -16,6 +17,7 @@
 #include "debug.h"
 #include "work.h"
 #include <assert.h>
+#include <raylib.h>
 #include <stdio.h>
 #include <stdint.h>
 
@@ -29,6 +31,7 @@ static inline PlayerToolSlot *add_tool(PlayerController *player, PlayerToolKind 
 	return slot;
 }
 
+
 PlayerController player_create(World *world, Vec2 position) {
 	Entity entity = entity_create_miner(world, position);
 
@@ -37,6 +40,7 @@ PlayerController player_create(World *world, Vec2 position) {
 		.movement = {.speed = 1.5f},
 		.dig = { .speed = 100 },
 		.is_facing_right = true,
+		.bag = { .size = 5000 },
 	};
 
 	PlayerToolSlot *pickaxe = add_tool(&player, PLAYER_TOOL_PICKAXE, 0);
@@ -100,26 +104,59 @@ static inline uint32_t dig_total_hardness(Game *game, Vec2i target) {
 	return sum;
 }
 
+
+static const int BRUSH_SIZE = 1;
+#define foreach_BRUSH(_x, _y) \
+	for (int (_y) = -BRUSH_SIZE; (_y) <= BRUSH_SIZE; (_y)++) \
+	for (int (_x) = -BRUSH_SIZE; (_x) <= BRUSH_SIZE; (_x)++)
+
+
+static inline uint32_t current_bag_used_size(PlayerBag *bag) {
+	uint32_t used = 0;
+	for (int i = 0; i < MINERAL__SIZE; i++) {
+		used += bag->amount[i];
+	}
+	return used;
+}
+
+static inline void add_tile_composition_to_bag(PlayerController* player, Tile tile) {
+	uint32_t used = current_bag_used_size(&player->bag);
+	for (int i = 0; i < TILE_COMPOSITION_MAX; i++) {
+		TileComposition composition = tile_data[tile].composition[i];
+		if (composition.mineral == MINERAL__NONE)
+			break;
+		uint32_t amount = composition.amount;
+		if (amount + used > player->bag.size)
+			amount = player->bag.size - used;
+		player->bag.amount[composition.mineral] += amount;
+		used += amount;
+	}
+	printf("BAG: %d / %d\n", used, player->bag.size);
+}
+
+
 static inline void player_dig(Game *game, PlayerController* player, Vec2i target) {
 	if (!input.digging) {
+		work_reset(&player->dig.work);
 		return;
 	}
 
 	Work* work = &player->dig.work;
-	if (!vec2i_eq(target, player->dig.target) || work_is_inactive(work)) {
+	work_validate(work, vec2i_eq(target, player->dig.target));
+
+	if (work_is_inactive(*work)) {
 		player->dig.target = target;
 		uint32_t hardness = dig_total_hardness(game, target);
-		if (hardness == 0) {
-			return;
-		}
+		if (hardness == 0) return;
+		// TODO: Once you can empty your bag, prevent digging
+		// Or better yet, make the excess tiles turn into rubble tiles
+		// uint32_t used = current_bag_used_size(&player->bag);
+		// if (used >= player->bag.size) return;
 		work_start(work, 10 * hardness);
-		// printf(WORK_FMT"\n", WORK_ARG(*work));
 	}
 
 	WorkUnit progress = player->dig.speed;
-	if (tile_is_unbreakable(player->dig.tile))
-		progress = 0;
-	if (!work_progress(work, progress))
+	if (!work_step(work, progress))
 		return;
 
 	// printf(WORK_FMT"\n", WORK_ARG(*work));
@@ -127,16 +164,15 @@ static inline void player_dig(Game *game, PlayerController* player, Vec2i target
 	// material_composition_merge_into(&player->bag, &composition);
 	// material_composition_print(&player->bag);
 	work_reset(work);
-	static const int BRUSH_SIZE = 1;
-	for (int i = -BRUSH_SIZE; i <= BRUSH_SIZE; i++) {
-	for (int j = -BRUSH_SIZE; j <= BRUSH_SIZE; j++) {
+	foreach_BRUSH(i, j) {
 		int x = target.x + i;
 		int y = target.y + j;
 		Tile tile = map_get(game->map, x, y);
 		if (tile_is_unbreakable(tile))
 			continue;
+		add_tile_composition_to_bag(player, tile);
 		map_set(game->map, x, y, TILE_AIR);
-	}}
+	}
 }
 
 
@@ -149,10 +185,8 @@ static inline Vec2i current_mouse_tile() {
 
 
 static inline void player_build(Game *game, Tile tile) {
-	static const int BRUSH_SIZE = 3;
 	Vec2i tile_position = current_mouse_tile();
-	for (int i = 0; i < BRUSH_SIZE; i++)
-	for (int j = 0; j < BRUSH_SIZE; j++) {
+	foreach_BRUSH(i, j) {
 		int x = tile_position.x + i;
 		int y = tile_position.y + j;
 		if (!tile_is_unbreakable(map_get(game->map, x, y)))
@@ -209,7 +243,6 @@ static inline void player_use(Game *game, PlayerController *player, PlayerToolSl
 }
 
 
-
 void player_update(Game *game, PlayerController* player) {
 	player_movement(game, player);
 	player_dig(game, player, current_mouse_tile());
@@ -248,3 +281,15 @@ void player_render(Game *game, PlayerController* player) {
 	// sprite_set_position(player->sprite, *position);
 }
 
+
+void player_render_interaction(struct game *game, PlayerController* player) {
+	if (work_is_active(player->dig.work)) {
+		int x = (player->dig.target.x - BRUSH_SIZE) * TILE_PIXEL_SIZE;
+		int y = (player->dig.target.y - BRUSH_SIZE) * TILE_PIXEL_SIZE;
+		int w = (BRUSH_SIZE * 2 + 1) * TILE_PIXEL_SIZE;
+		int h = (BRUSH_SIZE * 2 + 1) * TILE_PIXEL_SIZE;
+
+		float alpha = (float)player->dig.work.remaining / (float)player->dig.work.total;
+		DrawRectangle(x, y, w, h, ColorAlpha(YELLOW, 1.0f - alpha));
+	}
+}

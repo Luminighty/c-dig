@@ -5,6 +5,7 @@ function Build()
 	require("meta.components.generate")()
 	require("meta.textures.generate")()
 	require("meta.tiles.generate")()
+	require("meta.minerals.generate")()
 end
 
 Build()

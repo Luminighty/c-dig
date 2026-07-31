@@ -53,7 +53,7 @@ void entity_destroy(World* world, Entity entity) {
 
 
 static inline bool is_query_matches(ComponentBitmap entity_components, ComponentBitmap query) {
-	for (int i = 0; i < (COMPONENT_SIZE / COMPONENTBITMAP_SLOTSIZE) + 1; i++)
+	for (int i = 0; i < (COMPONENT__SIZE / COMPONENTBITMAP_SLOTSIZE) + 1; i++)
 		if (entity_components.bytes[i] != (entity_components.bytes[i] | query.bytes[i]))
 			return false;
 	return true;
