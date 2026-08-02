@@ -22,6 +22,7 @@
 #define GAME_SIZE   ((GAME_HEIGHT) * (GAME_WIDTH))
 
 #define DEFAULT_PORT 61216
+#define PING_DELAY 50
 
 typedef enum {
 	RENDER_LAYER_BACKGROUND,

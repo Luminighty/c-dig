@@ -2,7 +2,7 @@
 #include "linalg.h"
 
 
-static const int DEFAULT_GAME_SCALE = 3;
+static const int DEFAULT_GAME_SCALE = 2;
 static const int DEFAULT_UI_SCALE = 2;
 
 bool IS_HEADLESS = false;

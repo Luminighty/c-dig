@@ -24,8 +24,9 @@ Component({ "NetworkEntity", {
 Component({ "Rigidbody", {
 	{ "id" , "ColliderId" },
 	{ "velocity" , Type.vec2 },
-	{ "on_ground" , Type.bool },
 	{ "gravity" , Type.float },
+	{ "on_ground" , Type.bool },
+	{ "static_body" , Type.bool },
 } })
 
 Component({ "Light", {

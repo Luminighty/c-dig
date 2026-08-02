@@ -74,6 +74,9 @@ static void physics_system(World *world) {
 			col->box.center = *position;
 		}
 
+		if (rb->static_body)
+			continue;
+
 		rb->velocity.y = fminf(rb->velocity.y + rb->gravity, MAX_GRAVITY);
 		Vec2 delta = rb->velocity;
 		ColliderMoveResult result = collider_move(rb->id, delta);

@@ -27,8 +27,9 @@ typedef struct {
 typedef struct {
 	ColliderId id;
 	Vec2 velocity;
-	bool on_ground;
 	float gravity;
+	bool on_ground;
+	bool static_body;
 } Rigidbody;
 
 typedef struct {

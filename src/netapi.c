@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -132,33 +133,32 @@ static inline void set_socket_reuse(int socket) {
 
 
 NetServer *server_open(uint16_t port) {
+	printf("[NET] Creating server\n");
 	NetServer *server = malloc(sizeof(NetServer));
 	memset(server, 0, sizeof(NetServer));
 
 	// nil connection
 	da_push(server->connections, (Connection){0});
 
-	server->udp = socket(AF_INET, SOCK_DGRAM, 0);
-	server->tcp = socket(AF_INET, SOCK_STREAM, 0);
-
-	set_socket_reuse(server->tcp);
-	set_socket_reuse(server->udp);
-
-	set_nonblocking(server->tcp);
-	set_nonblocking(server->udp);
-
 	struct sockaddr_in addr = {0};
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	addr.sin_port = htons(port);
-
-	// WARN: we should probably handle this gracefully
-	assert(bind(server->udp, (struct sockaddr*)&addr, sizeof(addr)) == 0);
-	assert(bind(server->tcp, (struct sockaddr*)&addr, sizeof(addr)) == 0);
-
 	server->address = address_from_sockaddr(addr);
 
+	// WARN: we should probably handle asserts gracefully
+	server->tcp = socket(AF_INET, SOCK_STREAM, 0);
+	set_socket_reuse(server->tcp);
+	set_nonblocking(server->tcp);
+	assert(bind(server->tcp, (struct sockaddr*)&addr, sizeof(addr)) == 0);
 	assert(listen(server->tcp, MAX_LISTEN_COUNT) == 0);
+
+	server->udp = socket(AF_INET, SOCK_DGRAM, 0);
+	set_socket_reuse(server->udp);
+	// set_nonblocking(server->udp);
+	assert(bind(server->udp, (struct sockaddr*)&addr, sizeof(addr)) == 0);
+
+	printf("[NET] Server created\n");
 
 	return server;
 }
@@ -183,8 +183,10 @@ void server_close(NetServer *server) {
 NetId server_accept(NetServer *server) {
 	struct sockaddr_in addr = {0};
 	socklen_t len = sizeof(addr);
+	// printf("[NET] server_accept.\n");
 	int client_fd = accept(server->tcp, (struct sockaddr *)&addr, &len);
 	if (client_fd >= 0) {
+		printf("[NET] Client connected.\n");
 		NetId id = ++server->last_id;
 		Connection conn = {
 			.id = id,
@@ -192,8 +194,9 @@ NetId server_accept(NetServer *server) {
 			.tcp = client_fd,
 		};
 		da_push(server->connections, conn);
-		set_nonblocking(client_fd);
+		// set_nonblocking(client_fd);
 		
+		printf("[NET] Sending handshake.\n");
 		// NOTE: We should validate that this gets sent
 		Handshake handshake = { .id = id, .magic = MAGIC };
 		server_tcp_send(server, id, &handshake, sizeof(Handshake));
@@ -220,6 +223,15 @@ void server_disconnect(NetServer *server, NetId client_id) {
 }
 
 
+// TODO: This can cause issues if client has been disconnected, make sure they are cleaned up
+ssize_t server_tcp_peek(NetServer *server, NetId recipient) {
+	int available = 0;
+	Connection *client = find_connection(server, recipient);
+	assert(ioctl(client->tcp, FIONREAD, &available) != -1);
+	return available;
+}
+
+
 NetResult server_tcp_send(NetServer *server, NetId recipient, const void *message, size_t length) {
 	Connection *client = find_connection(server, recipient);
 	if (client == NULL) return net_none();
@@ -235,7 +247,10 @@ NetResult server_tcp_send(NetServer *server, NetId recipient, const void *messag
 
 NetResult server_tcp_recv(NetServer *server, NetId sender, void *buffer, size_t length) {
 	Connection *client = find_connection(server, sender);
-	if (client == NULL) return net_none();
+	if (client == NULL) {
+		printf("[NET] CLIENT IS NULL YET WE TRIED TO READ FROM IT!");
+		return net_none();
+	}
 
 	// TODO: Clean this up a little bit, but its fine for now as a quick handshake
 	if (!client->ready) {
@@ -247,9 +262,11 @@ NetResult server_tcp_recv(NetServer *server, NetId sender, void *buffer, size_t 
 		}
 		if (n == sizeof(response)) {
 			if (response.magic != MAGIC_RESP || response.id != sender) {
+				printf("[NET] Client handshake failed! Disconnecting it.\n");
 				server_disconnect(server, sender);
 				return net_closed();
 			}
+			printf("[NET] Client %d handshake success!\n", client->id);
 			client->address.port = response.port;
 			client->ready = true;
 		}
@@ -341,25 +358,30 @@ NetClient *client_connect(const char *ipaddr, uint16_t port) {
 	addr.sin_addr.s_addr = inet_addr(ipaddr);
 	addr.sin_port = htons(port);
 
-	client->udp = socket(AF_INET, SOCK_DGRAM, 0);
-	client->tcp = socket(AF_INET, SOCK_STREAM, 0);
 	client->server.port = port;
 	client->server.ip = ntohl(addr.sin_addr.s_addr);
-
-	// WARN: we should probably handle this gracefully
-	// NOTE: connect udp lets me check the sock port
-	assert(connect(client->udp, (struct sockaddr *)&addr, sizeof(addr)) == 0);
-	assert(connect(client->tcp, (struct sockaddr *)&addr, sizeof(addr)) == 0);
-
 	client->server = address_from_sockaddr(addr);
 
+	printf("[NET] Establishing the connection.\n");
+
+	// WARN: we should probably handle this gracefully
+	client->tcp = socket(AF_INET, SOCK_STREAM, 0);
+	assert(connect(client->tcp, (struct sockaddr *)&addr, sizeof(addr)) == 0);
+
+	client->udp = socket(AF_INET, SOCK_DGRAM, 0);
+	// NOTE: connect udp lets me check the sock port
+	assert(connect(client->udp, (struct sockaddr *)&addr, sizeof(addr)) == 0);
 	struct sockaddr_in self_addr = {0};
 	socklen_t len = sizeof(self_addr);
 	assert(getsockname(client->udp, (struct sockaddr *)&self_addr, &len) == 0);
 	NetAddress self_address = address_from_sockaddr(self_addr);
 
+	printf("[NET] Connected.\n");
+	printf("[NET] Waiting for handshake.\n");
+	// Handshake
 	Handshake handshake = {0};
 	client_tcp_recv(client, &handshake, sizeof(handshake));
+	printf("[NET] Replying to the handshake.\n");
 	assert(handshake.magic == MAGIC);
 	client->id = handshake.id;
 	HandshakeResponse response = {
@@ -393,13 +415,19 @@ NetResult client_tcp_send(NetClient *client, const void *message, size_t length)
 }
 
 
+ssize_t client_tcp_peek(NetClient *client) {
+	int available = 0;
+	assert(ioctl(client->tcp, FIONREAD, &available) != -1);
+	return available;
+}
+
 NetResult client_tcp_recv(NetClient *client, void *buffer, size_t length) {
-	ssize_t n =  recv(client->tcp, buffer, length, MSG_NOSIGNAL);
+	ssize_t n = recv(client->tcp, buffer, length, MSG_NOSIGNAL);
 	if (n == 0) return net_closed();
 	if (n > 0) return net_ok(n);
 	if (errno == EWOULDBLOCK || errno == EAGAIN)
 		return net_none();
-	perror("server_tcp_recv");
+	perror("client_tcp_recv");
 	return net_err();
 }
 

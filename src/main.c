@@ -10,15 +10,15 @@
 
 
 static void main_client() {
+
 	InitWindow(WINDOW_DIMENSION.x, WINDOW_DIMENSION.y, WINDOW_TITLE);
 	SetTargetFPS(60);
 
-	// game_client_init();
 	game_init();
+	game_client_init();
 	
 	while (!WindowShouldClose()) {
 		game_update();
-		// game_client_update();
 
 		BeginDrawing();
 		ClearBackground(BLACK);
@@ -28,6 +28,7 @@ static void main_client() {
 		fflush(stdout);
 		fflush(stderr);
 	}
+
 	game_destroy();
 	// game_client_destroy();
 }
@@ -42,8 +43,6 @@ static void main_server() {
 	
 	while (1) {
 		game_update();
-		game_server_update();
-
 
 		fflush(stdout);
 		fflush(stderr);
@@ -55,10 +54,13 @@ static void main_server() {
 	game_server_destroy();
 }
 
+
 int main(int argc, char *argv[]) {
 	args_parse(argc, argv);
+	args_debug();
 	printf("%d\n", cmd_args.mode);
 	switch (cmd_args.mode) {
+		case RUNMODE_SOLO: main_client(); break;
 		case RUNMODE_CLIENT: main_client(); break;
 		case RUNMODE_SERVER: main_server(); break;
 	}

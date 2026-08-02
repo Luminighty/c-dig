@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/types.h>
 
 
 typedef enum {
@@ -32,6 +33,7 @@ void server_disconnect(NetServer *server, NetId client);
 NetResult server_tcp_send(NetServer *server, NetId recipient, const void *message, size_t length);
 NetResult server_tcp_recv(NetServer *socket, NetId sender, void *buffer, size_t length);
 // size_t server_tcp_broadcast(NetServer *server, const void *message, size_t length);
+ssize_t server_tcp_peek(NetServer *server, NetId recipient);
 
 NetResult server_udp_send(NetServer *server, NetId recipient, const void *message, size_t length);
 NetResult server_udp_recv(NetServer *server, void *buffer, size_t length, NetId *sender);
@@ -45,6 +47,7 @@ void client_disconnect(NetClient *client);
 
 NetResult client_tcp_send(NetClient *client, const void *message, size_t length);
 NetResult client_tcp_recv(NetClient *client, void *buffer, size_t length);
+ssize_t client_tcp_peek(NetClient *client);
 
 NetResult client_udp_send(NetClient *client, const void *message, size_t length);
 NetResult client_udp_recv(NetClient *client, void *buffer, size_t length);

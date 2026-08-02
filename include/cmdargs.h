@@ -5,6 +5,7 @@
 
 
 typedef enum {
+	RUNMODE_SOLO,
 	RUNMODE_CLIENT,
 	RUNMODE_SERVER,
 } RunMode;
@@ -19,6 +20,7 @@ typedef struct {
 extern CmdArgs cmd_args;
 
 void args_parse(int argc, char *argv[]);
+void args_debug();
 
 
 #endif // ARGS_H

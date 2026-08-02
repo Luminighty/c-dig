@@ -22,8 +22,8 @@
 	} while (0)
 
 
-#define da_swapremove(vec, index) do {             \
-	(vec).items[index] = (vec).items[--(vec).count]; \
+#define da_swapremove(vec, index) do {                     \
+	(vec).items[index] = (vec).items[--((vec).count)]; \
 } while(0)
 #define da_pop(vec) (vec).items[--(vec).count]
 #define da_clear(vec) do { (vec).count = 0; } while(0)
@@ -31,6 +31,6 @@
 	(vec).count = 0; (vec).capacity = 0;        \
 	free((vec).items); (vec).items = NULL;      \
 } while(0) 
-
+#define da_last(vec) (vec).items[(vec).count - 1]
 
 #endif // VEC_H

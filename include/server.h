@@ -3,7 +3,7 @@
 
 
 void game_server_init();
-void game_server_update();
+void *game_server_thread(void *arg);
 void game_server_destroy();
 
 
