@@ -7,6 +7,7 @@
 #include "linalg.h"
 #include "map.h"
 #include "tile.h"
+#include <assert.h>
 #include <raylib.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -219,6 +220,27 @@ void sprite_set_parent(SpriteId sprite, SpriteId new_parent) {
 	display.sprites[sprite].parent = new_parent;
 }
 
+void sprite_socket_add(SpriteId sprite, SpriteSocketKey key, SpriteId socket_sprite) {
+	sprite_set_parent(socket_sprite, sprite);
+	assert(display.sprites[sprite].socket_count < SPRITE_SOCKET_MAX);
+	Sprite *sprite_data = &display.sprites[sprite];
+	// NOTE: Maybe we could just overwrite it if there is a duplicate
+	for (size_t i = 0; i < sprite_data->socket_count; i++) {
+		assert(sprite_data->sockets[i].key != key);
+	}
+	SpriteSocket *socket = &sprite_data->sockets[sprite_data->socket_count++];
+	socket->key = key;
+	socket->sprite = socket_sprite;
+}
+
+SpriteId sprite_socket_get(SpriteId sprite, SpriteSocketKey key) {
+	Sprite *sprite_data = &display.sprites[sprite];
+	for (size_t i = 0; i < sprite_data->socket_count; i++) {
+		if (sprite_data->sockets[i].key == key)
+			return sprite_data->sockets[i].sprite;
+	}
+	return 0;
+}
 
 static inline bool is_render_left_below(SpriteId left_id, SpriteId right_id) {
 	if (left_id == right_id) return false;

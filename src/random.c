@@ -65,5 +65,6 @@ float random_frange(float min, float max) {
 
 void random_init() {
 	srandom(time(NULL));
+	inner_state = rand();
 }
 

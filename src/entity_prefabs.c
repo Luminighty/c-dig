@@ -5,6 +5,7 @@
 #include "game.h"
 #include "linalg.h"
 #include "map.h"
+#include "player.h"
 #include "random.h"
 #include "texture_registry.h"
 
@@ -36,9 +37,9 @@ Entity entity_create_miner(World *world, Vec2 position) {
 	SpriteId sprite_beard = sprite_create(text_beard, VEC2_ZERO, sprite_offset);
 	SpriteId sprite_hat = sprite_create(text_hat, VEC2_ZERO, sprite_offset);
 
-	sprite_set_parent(sprite_clothes, sprite_main);
-	sprite_set_parent(sprite_beard, sprite_main);
-	sprite_set_parent(sprite_hat, sprite_main);
+	sprite_socket_add(sprite_main, PLAYER_SPRITE_SLOT_CLOTH, sprite_clothes);
+	sprite_socket_add(sprite_main, PLAYER_SPRITE_SLOT_BEARD, sprite_beard);
+	sprite_socket_add(sprite_main, PLAYER_SPRITE_SLOT_HAT, sprite_hat);
 
 	sprite_set_layer(sprite_main, RENDER_LAYER_PLAYER);
 	sprite_set_layer(sprite_clothes, RENDER_LAYER_PLAYER);

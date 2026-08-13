@@ -23,6 +23,7 @@
 
 #define DEFAULT_PORT 61216
 #define PING_DELAY 50
+#define NET_DELAY_MS 50
 
 typedef enum {
 	RENDER_LAYER_BACKGROUND,

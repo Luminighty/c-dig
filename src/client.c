@@ -64,9 +64,14 @@ void send_update_client_player(GameClient *client) {
 		.entity = *netentity,
 		.position = *position,
 	};
-	printf("Sending message_entity_sync %f;%f\n", position->x, position->y);
+	// printf("Sending message_entity_sync %f;%f\n", position->x, position->y);
 	client_tcp_send(client->client, &header, sizeof(header));
 	client_tcp_send(client->client, &body, sizeof(NetMessageEntitySync));
+}
+
+void game_client_update_map(Tile tile, Rect2i rect) {
+	
+
 }
 
 
@@ -86,11 +91,29 @@ static inline void handle_entity_sync(GameClient *client, NetMessageHeader heade
 	NetMessageEntitySync body = {0};
 	printf("Reading handle_entity_sync body\n");
 	client_tcp_recv(client->client, &body, header.message_length);
-	printf(
-		"Sync entity: %d:%d -> %f,%f\n", 
-		body.entity.id, body.entity.owner, 
-		body.position.x, body.position.y
-	);
+	// printf(
+	// 	"Sync entity: %d:%d -> %f,%f\n", 
+	// 	body.entity.id, body.entity.owner, 
+	// 	body.position.x, body.position.y
+	// );
+	NetworkEntityData *net_entity = find_network_entity(client, body.entity.id);
+	if (entity_is_alive(game.world, net_entity->entity)) {
+		Entity entity = net_entity->entity;
+		Position *position = entity_get_position(game.world, entity);
+		position->x = body.position.x;
+		position->y = body.position.y;
+	} else {
+		// TODO: We will need to do more syncing, but this is just a quick get-it-working code
+		net_entity->entity = entity_create_miner(game.world, body.position);
+		Rigidbody *rb = entity_get_rigidbody(game.world, net_entity->entity);
+		rb->static_body = true;
+	}
+}
+
+
+static inline void handle_map_update(GameClient *client, NetMessageHeader header) {
+	NetMessageEntitySync body = {0};
+	client_tcp_recv(client->client, &body, header.message_length);
 	NetworkEntityData *net_entity = find_network_entity(client, body.entity.id);
 	if (entity_is_alive(game.world, net_entity->entity)) {
 		Entity entity = net_entity->entity;
@@ -116,11 +139,14 @@ static inline void handle_message(GameClient *client, NetMessageHeader header) {
 		case NET_MESSAGE_ENTITY_SYNC:
 			handle_entity_sync(client, header);
 			break;
+		case NET_MESSAGE_MAP_UPDATE:
+			break;
 		case NET_MESSAGE__SIZE:
 			UNREACHABLE("NET_MESSAGE__SIZE");
 			break;
 	}
 }
+
 
 static inline void client_receive(GameClient *client) {
 	NetMessageHeader header = {0};
@@ -157,7 +183,7 @@ void *game_client_thread(void *arg) {
 		client_ping(&client);
 		send_update_client_player(&client);
 
-		usleep(100 * 1000);
+		usleep(NET_DELAY_MS * 1000);
 	}
 	return NULL;
 }

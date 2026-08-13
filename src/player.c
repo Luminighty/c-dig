@@ -62,14 +62,20 @@ static void randomize_sprite(PlayerController* player) {
 	// The issue is that I do not store the slots anymore in the player controller
 	// So this would have to be implemented on the entity level
 
-	// TextureId body = random_range(TEXTURE_MINER_BODY_0000, TEXTURE_MINER_BODY_0005 + 1);
-	// TextureId cloth = random_range(TEXTURE_MINER_CLOTH_0000, TEXTURE_MINER_CLOTH_0005 + 1);
-	// TextureId beard = random_range(TEXTURE_MINER_BEARD_0000, TEXTURE_MINER_BEARD_0005 + 1);
-	// TextureId hat = random_range(TEXTURE_MINER_HAT_0000, TEXTURE_MINER_HAT_0005 + 1);
-	// sprite_set_texture(player->sprites[PLAYER_SPRITE_SLOT_BODY], body);
-	// sprite_set_texture(player->sprites[PLAYER_SPRITE_SLOT_CLOTH], cloth);
-	// sprite_set_texture(player->sprites[PLAYER_SPRITE_SLOT_BEARD], beard);
-	// sprite_set_texture(player->sprites[PLAYER_SPRITE_SLOT_HAT], hat);
+	TextureId texture_body = random_range(TEXTURE_MINER_BODY_0000, TEXTURE_MINER_BODY_0005 + 1);
+	TextureId texture_cloth = random_range(TEXTURE_MINER_CLOTH_0000, TEXTURE_MINER_CLOTH_0005 + 1);
+	TextureId texture_beard = random_range(TEXTURE_MINER_BEARD_0000, TEXTURE_MINER_BEARD_0005 + 1);
+	TextureId texture_hat = random_range(TEXTURE_MINER_HAT_0000, TEXTURE_MINER_HAT_0005 + 1);
+
+	SpriteId body = *entity_get_spriteid(game.world, player->entity);
+	SpriteId cloth = sprite_socket_get(body, PLAYER_SPRITE_SLOT_CLOTH);
+	SpriteId beard = sprite_socket_get(body, PLAYER_SPRITE_SLOT_BEARD);
+	SpriteId hat = sprite_socket_get(body, PLAYER_SPRITE_SLOT_HAT);
+
+	sprite_set_texture(body, texture_body);
+	sprite_set_texture(cloth, texture_cloth);
+	sprite_set_texture(beard, texture_beard);
+	sprite_set_texture(hat, texture_hat);
 }
 
 
@@ -247,10 +253,10 @@ void player_update(Game *game, PlayerController* player) {
 	player_movement(game, player);
 	player_dig(game, player, current_mouse_tile());
 	if (input.randomize_player) {
-		Entity temp = player->entity;
-		player->entity = game->chest;
-		game->chest = temp;
-		// randomize_sprite(player);
+		// Entity temp = player->entity;
+		// player->entity = game->chest;
+		// game->chest = temp;
+		randomize_sprite(player);
 	}
 	Vec2 world_mouse = vec2_add(camera_get_position(), input.mouse);
 	Vec2i world_mouse_tile = world_to_tile_coord(world_mouse);

@@ -35,7 +35,6 @@ static void main_client() {
 
 
 static void main_server() {
-	printf("SERVER\n");
 	IS_HEADLESS = true;
 
 	game_init();

@@ -9,11 +9,12 @@
 #include <stdint.h>
 
 
-#define SPRITE_MAX 512
+#define SPRITE_MAX 1024
+#define SPRITE_SOCKET_MAX 8
 
 typedef uint32_t ZIndex;
 typedef uint32_t SpriteId;
-
+typedef uint32_t SpriteSocketKey;
 
 
 typedef enum {
@@ -25,6 +26,12 @@ typedef enum {
 
 
 typedef struct {
+	SpriteId sprite;
+	SpriteSocketKey key;
+} SpriteSocket;
+
+
+typedef struct {
 	SpriteId parent;
 	TextureId texture;
 	Vec2 position;
@@ -32,6 +39,8 @@ typedef struct {
 	SpriteFlag flags;
 	RenderLayer layer;
 	ZIndex z_index;
+	SpriteSocket sockets[SPRITE_SOCKET_MAX];
+	uint8_t socket_count; 
 } Sprite;
 
 
@@ -58,6 +67,12 @@ void sprite_set_position(SpriteId sprite, Vec2 position);
 void sprite_set_offset(SpriteId sprite, Vec2 offset);
 void sprite_set_enabled(SpriteId sprite, bool enabled);
 void sprite_set_parent(SpriteId sprite, SpriteId new_parent);
+
+// NOTE: This also sets `socket_sprite`'s parent to be `sprite`
+//        I don't yet see a case where we wouldn't want that, but
+//        if it's needed we can always just remove that part of it.
+void sprite_socket_add(SpriteId sprite, SpriteSocketKey key, SpriteId socket_sprite);
+SpriteId sprite_socket_get(SpriteId sprite, SpriteSocketKey key);
 
 void sprite_set_zindex(SpriteId sprite, ZIndex z_index);
 void sprite_set_layer(SpriteId sprite, RenderLayer layer);

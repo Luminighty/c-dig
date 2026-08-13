@@ -2,6 +2,8 @@
 #define NET_MESSAGE_H
 
 #include "components.h"
+#include "linalg.h"
+#include "tile.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -10,6 +12,7 @@ typedef enum {
 	NET_MESSAGE_CLOSE = 1,
 	NET_MESSAGE_PING,
 	NET_MESSAGE_ENTITY_SYNC,
+	NET_MESSAGE_MAP_UPDATE,
 	NET_MESSAGE__SIZE,
 } NetMessageKind;
 
@@ -25,6 +28,12 @@ typedef struct {
 	NetworkEntity entity;
 	Position position;
 } NetMessageEntitySync;
+
+
+typedef struct {
+	Tile tile;
+	Rect2i rect;
+} NetMessageMapUpdate;
 
 
 typedef struct {

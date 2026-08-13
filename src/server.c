@@ -71,12 +71,12 @@ static inline void broadcast(GameServer *server, NetId source, NetMessageHeader 
 static inline void handle_entity_sync(GameServer *server, GameClient *client, NetMessageHeader header) {
 	NetMessageEntitySync body = {0};
 	NetResult result = server_tcp_recv(server->server, client->id, &body, header.message_length);
-	printf(
-		"Sync entity: %d:%d -> %f,%f (status: %d, bytes %zu/%zu)\n", 
-		body.entity.id, body.entity.owner, 
-		body.position.x, body.position.y,
-		result.status, result.length, header.message_length
-	);
+	// printf(
+	// 	"Sync entity: %d:%d -> %f,%f (status: %d, bytes %zu/%zu)\n", 
+	// 	body.entity.id, body.entity.owner, 
+	// 	body.position.x, body.position.y,
+	// 	result.status, result.length, header.message_length
+	// );
 	broadcast(server, client->id, header, &body);
 }
 
@@ -167,7 +167,7 @@ void *game_server_thread(void *arg) {
 		for (size_t i = 0; i < server.clients.count; i++) {
 			process_client(&server, &server.clients.items[i]);
 		}
-		usleep(100 * 1000);
+		usleep(NET_DELAY_MS * 1000);
 	}
 	// process_udp();
 }
