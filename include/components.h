@@ -7,12 +7,13 @@
 #include "linalg.h"
 #include "physics.h"
 #include "display.h"
-#include "network_id.h"
+#include "netentity_id.h"
 
 typedef struct {} PlayerTag;
 
 typedef struct {
 	Vec2 target;
+	Entity target_entity;
 } RandomWalk;
 
 typedef struct {
@@ -20,8 +21,9 @@ typedef struct {
 } Controllable;
 
 typedef struct {
-	NetworkId id;
+	NetEntityId id;
 	uint32_t owner;
+	bool dirty;
 } NetworkEntity;
 
 typedef struct {

@@ -31,7 +31,7 @@ return function()
 	io.close()
 
 	-- Source File Gen
-	io.output("./src/" .. filename .. ".c")
+	io.output("./core/" .. filename .. ".c")
 	MathSourceBegin(header_file)
 	MathInclude(src_includes)
 	generate()

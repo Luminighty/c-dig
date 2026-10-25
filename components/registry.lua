@@ -55,4 +55,5 @@ Type = {
 	vec2 = "Vec2",
 	bool = "bool",
 	float = "float",
+	Entity = "Entity",
 }

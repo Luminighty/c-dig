@@ -54,7 +54,7 @@ typedef struct {
 
 void display_init();
 void display_destroy();
-void display_render();
+DisplayServer *display_get_server();
 
 void camera_set_position(Vec2 position);
 Vec2 camera_get_position();
@@ -62,6 +62,7 @@ Vec2 camera_get_position();
 SpriteId sprite_create(TextureId texture, Vec2 position, Vec2 offset);
 void sprite_destroy(SpriteId sprite);
 
+TextureId sprite_get_texture(SpriteId sprite);
 void sprite_set_texture(SpriteId sprite, TextureId texture);
 void sprite_set_position(SpriteId sprite, Vec2 position);
 void sprite_set_offset(SpriteId sprite, Vec2 offset);

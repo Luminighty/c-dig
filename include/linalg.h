@@ -14,6 +14,8 @@ typedef union {
 	int v[2];
 } Vec2i;
 
+#define VEC2I_FMT "Vec2i(%d, %d)"
+#define VEC2I_ARG(vec) (vec).x, (vec).y
 Vec2i vec2i_add(Vec2i a, Vec2i b);
 Vec2i vec2i_sub(Vec2i a, Vec2i b);
 bool vec2i_eq(Vec2i a, Vec2i b);
@@ -39,6 +41,8 @@ typedef union {
 	int v[3];
 } Vec3i;
 
+#define VEC3I_FMT "Vec3i(%d, %d, %d)"
+#define VEC3I_ARG(vec) (vec).x, (vec).y, (vec).z
 Vec3i vec3i_add(Vec3i a, Vec3i b);
 Vec3i vec3i_sub(Vec3i a, Vec3i b);
 bool vec3i_eq(Vec3i a, Vec3i b);
@@ -64,6 +68,8 @@ typedef union {
 	float v[2];
 } Vec2;
 
+#define VEC2_FMT "Vec2(%f, %f)"
+#define VEC2_ARG(vec) (vec).x, (vec).y
 Vec2 vec2_add(Vec2 a, Vec2 b);
 Vec2 vec2_sub(Vec2 a, Vec2 b);
 bool vec2_eq(Vec2 a, Vec2 b);
@@ -89,6 +95,8 @@ typedef union {
 	float v[3];
 } Vec3;
 
+#define VEC3_FMT "Vec3(%f, %f, %f)"
+#define VEC3_ARG(vec) (vec).x, (vec).y, (vec).z
 Vec3 vec3_add(Vec3 a, Vec3 b);
 Vec3 vec3_sub(Vec3 a, Vec3 b);
 bool vec3_eq(Vec3 a, Vec3 b);

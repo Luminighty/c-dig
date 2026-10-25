@@ -9,5 +9,5 @@ return function()
 	local includes = GetIncludes()
 
 	GenerateHeaders(components, includes, "./include/components.h")
-	GenerateSource(components, "./src/components.c")
+	GenerateSource(components, "./core/components.c")
 end

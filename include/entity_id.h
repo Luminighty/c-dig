@@ -12,5 +12,10 @@ typedef union entity {
 	} as;
 } Entity;
 
+#define EntityFMT "Entity(#%d, gen%d)"
+#define EntityARG(entity) ((entity).as.index), ((entity).as.gen)
+
+static const Entity ENTITY_NONE = {0};
+
 
 #endif // ENTITY_H

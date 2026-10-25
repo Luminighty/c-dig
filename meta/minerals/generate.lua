@@ -52,7 +52,7 @@ return function()
 	header(minerals)
 	io.close()
 
-	io.output("./src/" .. source_file)
+	io.output("./core/" .. source_file)
 	source(minerals)
 	io.close()
 end

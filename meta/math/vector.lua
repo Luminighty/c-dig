@@ -16,6 +16,27 @@ local function vector_typedef(vector)
 	io.write(string.format("} %s;\n\n", vector.name))
 end
 
+local function vector_fmt(vec)
+	if not IS_HEADER then
+		return
+	end
+
+	local fmt_map = { int = "%d", float = "%f" }
+	local fmt = fmt_map[vec.component]
+	local formats = {}
+	local args = {}
+	for i = 1, vec.dimension do
+		local field = component_names[i]
+		table.insert(formats, fmt)
+		table.insert(args, ("(vec).%s"):format(field))
+	end
+	local formats_str = table.concat(formats, ", ")
+	local args_str = table.concat(args, ", ")
+	local name = string.upper(vec.name)
+	io.write(string.format('#define %s_FMT "%s(%s)"\n', name, vec.name, formats_str))
+	io.write(string.format("#define %s_ARG(vec) %s\n", name, args_str))
+end
+
 local function vector_eq(vector, op)
 	FunctionBegin("bool", vector.prefix .. "_eq", vector.name .. " a", vector.name .. " b")
 	if IS_HEADER then
@@ -181,6 +202,7 @@ function Vector(vector)
 
 	io.write("// ////// ", vector.name, " //////\n")
 	vector_typedef(vector)
+	vector_fmt(vector)
 	vector_op(vector, "add", "+")
 	vector_op(vector, "sub", "-")
 	vector_eq(vector)

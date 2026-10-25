@@ -84,7 +84,7 @@ return function()
 	header(tiles)
 	io.close()
 
-	io.output("./src/" .. source_file)
+	io.output("./core/" .. source_file)
 	source(tiles)
 	io.close()
 end

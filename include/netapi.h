@@ -20,7 +20,8 @@ typedef struct {
 
 
 typedef uint32_t NetId;
-#define NET_ID_NONE 0
+#define NET_ID_NONE   0
+#define NET_ID_SERVER 0
 
 typedef struct net_server NetServer;
 
@@ -34,6 +35,7 @@ NetResult server_tcp_send(NetServer *server, NetId recipient, const void *messag
 NetResult server_tcp_recv(NetServer *socket, NetId sender, void *buffer, size_t length);
 // size_t server_tcp_broadcast(NetServer *server, const void *message, size_t length);
 ssize_t server_tcp_peek(NetServer *server, NetId recipient);
+NetResult server_tcp_peek_into(NetServer *server, NetId recipient, void *buffer, size_t length);
 
 NetResult server_udp_send(NetServer *server, NetId recipient, const void *message, size_t length);
 NetResult server_udp_recv(NetServer *server, void *buffer, size_t length, NetId *sender);
@@ -42,12 +44,14 @@ NetResult server_udp_recv(NetServer *server, void *buffer, size_t length, NetId 
 
 typedef struct net_client NetClient;
 
+NetId client_get_id(NetClient *client);
 NetClient *client_connect(const char *ipaddr, uint16_t port);
 void client_disconnect(NetClient *client);
 
 NetResult client_tcp_send(NetClient *client, const void *message, size_t length);
 NetResult client_tcp_recv(NetClient *client, void *buffer, size_t length);
 ssize_t client_tcp_peek(NetClient *client);
+NetResult client_tcp_peek_into(NetClient *client, void *buffer, size_t length);
 
 NetResult client_udp_send(NetClient *client, const void *message, size_t length);
 NetResult client_udp_recv(NetClient *client, void *buffer, size_t length);

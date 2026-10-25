@@ -1,49 +1,19 @@
-IDIR=./include
-TARGET=bin/main
+.PHONY: debug release clean
 
-CC=gcc
-CFLAGS=-I$(IDIR)
-LDFLAGS=-Llibs -lraylib -lpthread -lm -ldl
-LDFLAGS_WIN=-lgdi32 -lwinmm
-LDFLAGS_UNIX=-lGL -ldl -lX11
-
+TARGET_OS=Linux
 ifeq ($(OS),Windows_NT)
-	LDFLAGS += $(LDFLAGS_WIN)
+	TARGET_OS = Windows
 else
-	LDFLAGS += $(LDFLAGS_UNIX)
+	TARGET_OS = $(shell uname -s)
 endif
 
-ifneq ($(filter release,$(MAKECMDGOALS)),)
-    CFLAGS += -O2 -DNDEBUG
-else
-    CFLAGS += -g -O0 -Wall -Wextra -DDEV_MODE -fsanitize=address
-endif
+debug:
+	@echo "The detected OS is: $(TARGET_OS)"
+	lua ./luamake/make.lua $(TARGET_OS) debug
 
-DEPS=$(wildcard $(IDIR)/*.h)
-SRCS := $(shell find src -name '*.c')
-OBJS=$(patsubst src/%.c, build/%.o, $(SRCS))
-
-.PHONY: all debug release clean pre_build
-
-all: $(TARGET)
-
-
-debug: all
-
-release: all
-
-build/%.o: src/%.c $(DEPS)
-	@mkdir -p $(dir $@)
-	$(CC) -c -o $@ $< $(CFLAGS)
-
-
-$(TARGET): $(OBJS)
-	mkdir -p bin
-	cp -r assets bin/
-	$(CC) -o $@ $^ $(LDFLAGS) $(CFLAGS)
-
+release:
+	lua ./luamake/make.lua $(TARGET_OS) release
 
 clean:
 	rm -rf build bin
-
 

@@ -5,4 +5,3 @@ build/
 compile_commands.json
 
 *.log
-core
