@@ -1,6 +1,7 @@
 require("meta.minerals.registry")
 
 local HEADER_GUARD = "MINERAL_H"
+local _, MODULE_PATH = ...
 local file = "mineral"
 local header_file = file .. ".h"
 local source_file = file .. ".c"
@@ -18,7 +19,7 @@ local function generate_enum(minerals)
 end
 
 local function header(minerals)
-	HeaderGuardStart(HEADER_GUARD)
+	HeaderGuardStart(HEADER_GUARD, MODULE_PATH)
 
 	PipeFile("./meta/minerals/template.h")
 	io.write("\n")
@@ -33,7 +34,7 @@ local function header(minerals)
 end
 
 local function source(minerals)
-	SourceBegin(header_file)
+	SourceBegin(header_file, MODULE_PATH)
 	io.write("\n")
 	io.write(data_config .. " = {\n")
 

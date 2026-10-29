@@ -49,6 +49,7 @@ SpriteId sprite_create(TextureId texture, Vec2 position, Vec2 offset) {
 
 
 void sprite_destroy(SpriteId sprite) {
+	printf("Sprite %d destroyed.\n", sprite);
 	display.sprites[sprite].flags &= ~SPRITE_FLAG_ALIVE;
 }
 

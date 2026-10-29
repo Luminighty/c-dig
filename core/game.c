@@ -4,6 +4,7 @@
 #include "display.h"
 #include "entity.h"
 #include "linalg.h"
+#include "lua_api.h"
 #include "map.h"
 #include "physics.h"
 #include "random.h"
@@ -22,12 +23,14 @@ void game_init() {
 	game.systems = systems_create();
 	game.map = map_create();
 	game.world = world_create();
+	game.lua = lua_init();
 
 	systems_fire_init(&game.systems, game.world);
 }
 
 
 void game_destroy() {
+	lua_destroy(&game.lua);
 	map_destroy(game.map);
 	physics_destroy();
 }
@@ -43,6 +46,7 @@ void game_update() {
 	// player_update(&game, &game.player);
 	systems_fire_update(&game.systems, game.world);
 	map_update_light(game.map);
+	lua_callback(&game.lua, LUA_CALLBACK_UPDATE);
 }
 
 

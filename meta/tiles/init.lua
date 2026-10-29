@@ -1,6 +1,8 @@
 require("meta.tiles.registry")
+require("meta.utils")
 
 local HEADER_GUARD = "TILE_H"
+local _, MODULE_PATH = ...
 local file = "tile"
 local header_file = file .. ".h"
 local source_file = file .. ".c"
@@ -16,7 +18,7 @@ local function generate_enum(tiles)
 end
 
 local function header(tiles)
-	HeaderGuardStart(HEADER_GUARD)
+	HeaderGuardStart(HEADER_GUARD, MODULE_PATH)
 
 	PipeFile("./meta/tiles/template.h")
 	io.write("\n")
@@ -59,7 +61,7 @@ local function tile_composition(tile)
 end
 
 local function source(tiles)
-	SourceBegin(header_file)
+	SourceBegin(header_file, MODULE_PATH)
 	io.write("\n")
 	io.write("TileData tile_data[TILE__SIZE] = {\n")
 

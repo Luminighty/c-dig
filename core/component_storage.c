@@ -13,3 +13,6 @@ ComponentBitmap _componentbitmap_create(ComponentType c, ...) {
     return bitmap;
 }
 
+void componentbitmap_add(ComponentBitmap *bitmap, ComponentType c) {
+    bitmap->bytes[c / COMPONENTBITMAP_SLOTSIZE] |= COMPONENT_TO_SLOTBIT(c);
+}

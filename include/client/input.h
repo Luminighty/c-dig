@@ -18,6 +18,7 @@ typedef struct {
 
 	Vec2 ui_mouse;
 	bool ui_hovering;
+	bool hot_reload;
 } Input;
 
 

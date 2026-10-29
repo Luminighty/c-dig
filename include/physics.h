@@ -1,6 +1,7 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
+#include "collider_id.h"
 #include "entity_id.h"
 #include "linalg.h"
 #include "darray.h"
@@ -9,8 +10,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-
-typedef uint32_t ColliderId;
 
 
 typedef struct {
@@ -66,6 +65,7 @@ void physics_destroy();
 void physics_render();
 
 ColliderId collider_create(Entity parent, Vec2 center, Vec2 extends);
+void collider_destroy(ColliderId collider);
 Collider* collider_get(ColliderId id);
 
 ColliderMoveResult collider_move(ColliderId id, Vec2 delta);

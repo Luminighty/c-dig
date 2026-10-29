@@ -84,4 +84,6 @@ void player_update(struct game *game, PlayerController* player);
 void player_render(struct game *game, PlayerController* player);
 void player_render_interaction(struct game *game, PlayerController* player);
 
+Entity player_entity(PlayerController* player);
+
 #endif // PLAYER_H

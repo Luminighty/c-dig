@@ -3,6 +3,7 @@
 
 #include "entity.h"
 #include "linalg.h"
+#include "lua_api.h"
 #include "map.h"
 #include "systems.h"
 #include <stdint.h>
@@ -12,6 +13,7 @@ typedef struct game {
 	World *world;
 	Map *map;
 	Systems systems;
+	LuaState lua;
 } Game;
 
 extern Game game;

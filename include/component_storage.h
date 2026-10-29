@@ -18,6 +18,7 @@ typedef struct {
 #define componentbitmap_empty(...) _componentbitmap_create(COMPONENT__SIZE)
 #define componentbitmap_create(...) _componentbitmap_create(__VA_ARGS__, COMPONENT__SIZE)
 ComponentBitmap _componentbitmap_create(ComponentType c, ...);
+void componentbitmap_add(ComponentBitmap *bitmap, ComponentType c);
 
 // NOTE: I may need to generate this, but it's unused atm
 #define is_query_empty(query) !(query .bytes[0])

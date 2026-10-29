@@ -2,9 +2,11 @@
 #include "components.h"
 #include "config.h"
 #include "display.h"
+#include "entity_id.h"
 #include "game.h"
 #include "linalg.h"
 #include "map.h"
+#include "physics.h"
 #include "texture_registry.h"
 
 typedef enum {
@@ -62,6 +64,20 @@ Entity entity_create_miner(World *world, EntityPrefabPropsMiner props) {
 	return entity;
 }
 
+Entity entity_create_spoopy_fren(World *world, Vec2 position, Entity target) {
+	Entity entity = entity_create(world);
+	entity_add_controllable(world, entity, (Controllable){0});
+
+	entity_add_position(world, entity, position);
+	entity_add_chase(world, entity, (Chase){.target = target});
+
+	SpriteId sprite = sprite_create(TEXTURE_FREN, position, VEC2_ZERO);
+	entity_add_spriteid(world, entity, sprite);
+	sprite_set_layer(sprite, RENDER_LAYER_WALL);
+
+	return entity;
+}
+
 Entity entity_create_fren(World *world, Vec2 position) {
 	Entity entity = entity_create(world);
 	entity_add_controllable(world, entity, (Controllable){0});
@@ -72,7 +88,6 @@ Entity entity_create_fren(World *world, Vec2 position) {
 	SpriteId sprite = sprite_create(TEXTURE_FREN, position, VEC2_ZERO);
 	entity_add_spriteid(world, entity, sprite);
 	sprite_set_layer(sprite, RENDER_LAYER_WALL);
-
 
 	return entity;
 }

@@ -4,9 +4,12 @@
 #include "darray.h"
 #include "display.h"
 #include "entity.h"
+#include "entity_id.h"
 #include "entity_prefabs.h"
 #include "game.h"
 #include "linalg.h"
+#include "lua.h"
+#include "lua_api.h"
 #include "map.h"
 #include "physics.h"
 #include "random.h"
@@ -26,42 +29,42 @@ static void init_system(World *world) {
 	entity_create_fren(world, fren_spawn);
 }
 
-static void random_walk_system(World *world) {
-	Query query = componentbitmap_create(COMPONENT_POSITION, COMPONENT_RANDOMWALK);
-
-	foreach_entity(world, entity, query) {
-		Position *position = entity_get_position(world, entity);
-		RandomWalk *randomwalk = entity_get_randomwalk(world, entity);
-		Vec2 delta = vec2_sub(randomwalk->target, *position);
-		if (fabsf(delta.x) > 1.0f || fabsf(delta.y) > 1.0f) {
-			Vec2 move = vec2_scale(vec2_normalize(delta), 0.05f);
-			*position = vec2_add(*position, move);
-			continue;
-		}
-
-		if (entity_is_alive(world, randomwalk->target_entity)) {
-			Position *player_pos = entity_get_position(world, randomwalk->target_entity);
-			randomwalk->target = vec2_add(*player_pos, (Vec2){ .x = -50.0, .y = -30.0, });
-		} else {
-			Vec2 target_delta = {
-				.x = random_frange(-30.0, 30.0),
-				.y = random_frange(-30.0, 30.0)
-			};
-			Vec2 new_pos = vec2_add(*position, target_delta);
-
-			if (new_pos.x < 0)
-				new_pos.x = 30.0f;
-			if (new_pos.x > 500)
-				new_pos.x = -30.0f;
-			if (new_pos.y < 0)
-				new_pos.y = 30.0f;
-			if (new_pos.y > 500)
-				new_pos.y = -30.0f;
-
-			randomwalk->target = new_pos;
-		}
-	}
-}
+// static void random_walk_system(World *world) {
+// 	Query query = componentbitmap_create(COMPONENT_POSITION, COMPONENT_RANDOMWALK);
+//
+// 	foreach_entity(world, entity, query) {
+// 		Position *position = entity_get_position(world, entity);
+// 		RandomWalk *randomwalk = entity_get_randomwalk(world, entity);
+// 		Vec2 delta = vec2_sub(randomwalk->target, *position);
+// 		if (fabsf(delta.x) > 1.0f || fabsf(delta.y) > 1.0f) {
+// 			Vec2 move = vec2_scale(vec2_normalize(delta), 0.05f);
+// 			*position = vec2_add(*position, move);
+// 			continue;
+// 		}
+//
+// 		if (entity_is_alive(world, randomwalk->target_entity)) {
+// 			Position *player_pos = entity_get_position(world, randomwalk->target_entity);
+// 			randomwalk->target = vec2_add(*player_pos, (Vec2){ .x = -50.0, .y = -30.0, });
+// 		} else {
+// 			Vec2 target_delta = {
+// 				.x = random_frange(-30.0, 30.0),
+// 				.y = random_frange(-30.0, 30.0)
+// 			};
+// 			Vec2 new_pos = vec2_add(*position, target_delta);
+//
+// 			if (new_pos.x < 0)
+// 				new_pos.x = 30.0f;
+// 			if (new_pos.x > 500)
+// 				new_pos.x = -30.0f;
+// 			if (new_pos.y < 0)
+// 				new_pos.y = 30.0f;
+// 			if (new_pos.y > 500)
+// 				new_pos.y = -30.0f;
+//
+// 			randomwalk->target = new_pos;
+// 		}
+// 	}
+// }
 
 static void physics_system(World *world) {
 	Query query = componentbitmap_create(COMPONENT_RIGIDBODY);
@@ -116,14 +119,35 @@ Systems systems_create() {
 	Systems systems = {0};
 	da_push(systems.init, init_system);
 	da_push(systems.update, physics_system);
-	da_push(systems.update, random_walk_system);
+	// da_push(systems.update, random_walk_system);
 	da_push(systems.draw, sprite_system);
 	// da_push(systems.update, system_log);
 	return systems;
 }
 
 
+void systems_on_update(Systems *systems, SystemFn system) {
+	da_push(systems->update, system);
+}
+
+static inline void on_entity_destroyed(World *world, Entity entity) {
+	printf("Entity "EntityFMT" destroyed.\n", EntityARG(entity));
+	if (entity_has_component(world, entity, COMPONENT_SPRITEID)) {
+		sprite_destroy(*entity_get_spriteid(world, entity));
+	}
+	if (entity_has_component(world, entity, COMPONENT_LIGHT)) {
+		Vec2 *pos = entity_get_position(world, entity);
+		Vec2i tile = world_to_tile_coord(*pos);
+		map_remove_light_source(game.map, tile.x, tile.y);
+	}
+	if (entity_has_component(world, entity, COMPONENT_RIGIDBODY)) {
+		Rigidbody *rb = entity_get_rigidbody(world, entity);
+		collider_destroy(rb->id);
+	}
+}
+
 void systems_fire_init(Systems *systems, World *world) {
+	world_on_destroy(world, on_entity_destroyed);
 	for (size_t i = 0; i < systems->init.count; i++) {
 		(systems->init.items[i])(world);
 	}
@@ -141,4 +165,4 @@ void systems_fire_draw(Systems *systems, World *world) {
 		(systems->draw.items[i])(world);
 	}
 }
-
+ 

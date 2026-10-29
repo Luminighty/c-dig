@@ -48,7 +48,7 @@ PlayerController player_create(World *world, Entity entity) {
 	// add_tool(&player, PLAYER_TOOL_CHEST, 64);
 	// add_tool(&player, PLAYER_TOOL_ANVIL, 64);
 
-	world_print(world);
+	// world_print(world);
 
 	return player;
 }
@@ -297,4 +297,8 @@ void player_render_interaction(struct game *game, PlayerController* player) {
 		float alpha = (float)player->dig.work.remaining / (float)player->dig.work.total;
 		DrawRectangle(x, y, w, h, ColorAlpha(YELLOW, 1.0f - alpha));
 	}
+}
+
+Entity player_entity(PlayerController* player) {
+	return player->entity;
 }

@@ -16,6 +16,7 @@ EntityPrefabPropsMiner entity_miner_get_props(World *world, Entity entity);
 Entity entity_create_miner(World *world, EntityPrefabPropsMiner props);
 
 Entity entity_create_fren(World *world, Vec2 position);
+Entity entity_create_spoopy_fren(World *world, Vec2 position, Entity target);
 Entity entity_create_torch(World *world, Vec2i tile, int intensity);
 Entity entity_create_furniture(World *world, Vec2i tile, TextureId texture);
 

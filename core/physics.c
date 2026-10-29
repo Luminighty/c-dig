@@ -39,6 +39,7 @@ ColliderId collider_create(Entity parent, Vec2 center, Vec2 extends) {
 		.parent = parent,
 	};
 
+	// TODO: This can be done in a much cleaner way, but no rush
 	bool found_slot = false;
 	ColliderId id;
 	for_colliders(i) {
@@ -56,6 +57,12 @@ ColliderId collider_create(Entity parent, Vec2 center, Vec2 extends) {
 
 	assert(server.colliders.items[id].alive);
 	return id;
+}
+
+void collider_destroy(ColliderId collider) {
+	if (collider >= server.colliders.count)
+		return;
+	server.colliders.items[collider].alive = false;
 }
 
 Collider* collider_get(ColliderId id) { return &server.colliders.items[id]; }

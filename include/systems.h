@@ -23,7 +23,7 @@ typedef struct {
 Systems systems_create();
 Systems systems_destroy();
 
-void system_on_update(SystemFn callback);
+void systems_on_update(Systems *systems, SystemFn system);
 
 void systems_fire_init(Systems *systems, struct world *world);
 void systems_fire_draw(Systems *systems, struct world *world);

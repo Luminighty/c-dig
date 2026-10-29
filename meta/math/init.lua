@@ -3,6 +3,8 @@ require("meta.math.vector")
 require("meta.math.basic")
 require("meta.math.rect")
 
+require("meta.math.ffi")
+
 local header_guard = "LINALG_H"
 local filename = "linalg"
 local src_includes = { "<stdio.h>", "<assert.h>", "<stddef.h>" }
@@ -36,4 +38,10 @@ return function()
 	MathInclude(src_includes)
 	generate()
 	MathSourceEnd()
+	io.close()
+
+	io.output("./lua/cdef/" .. filename .. ".lua")
+	GenerateMathFFI()
+	io.close()
+
 end

@@ -1,15 +1,19 @@
 require("components.registry")
 
 Include("linalg.h")
-Include("physics.h")
-Include("display.h")
+Include("collider_id.h")
+Include("sprite_id.h")
+Include("entity_id.h")
 Include("netentity_id.h")
 
 Flag("PlayerTag")
 
 Component({ "RandomWalk", {
 	{ "target" , Type.vec2 },
-	{ "target_entity" , Type.Entity },
+} })
+
+Component({ "Chase", {
+	{ "target" , Type.Entity },
 } })
 
 -- Eventually we need to replace this with a better player index

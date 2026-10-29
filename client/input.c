@@ -27,6 +27,8 @@ void input_update() {
 	input.jump = IsKeyPressed(KEY_SPACE);
 	input.randomize_player = IsKeyPressed(KEY_R);
 
+	input.hot_reload = IsKeyPressed(KEY_F5);
+
 	for (int i = 0; i < 10; i++) {
 		input.slot[i] = IsKeyPressed(KEY_ZERO + i);
 	}

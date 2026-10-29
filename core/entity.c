@@ -1,6 +1,8 @@
 #include "entity.h"
 #include "component_storage.h"
 #include "components.h"
+#include "darray.h"
+#include "entity_id.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -13,6 +15,10 @@ World *world_create() {
 	World *w = malloc(sizeof(World));
 	w->entities.size = 1;
 	return w;
+}
+
+void world_on_destroy(World *world, EntityCallback callback) {
+	da_push(world->on_destroys, callback);
 }
 
 
@@ -46,6 +52,9 @@ bool entity_is_alive(World* world, Entity entity) {
 void entity_destroy(World* world, Entity entity) {
 	if (!world->entities.alive[entity.as.index])
 		return;
+	for (size_t i = 0; i < world->on_destroys.count; i++) {
+		world->on_destroys.items[i](world, entity);
+	}
 	world->entities.alive[entity.as.index] = false;
 	world->entities.next_free[entity.as.index] = world->entities.first_free;
 	world->entities.first_free = entity.as.index;

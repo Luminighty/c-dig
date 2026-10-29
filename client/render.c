@@ -9,6 +9,8 @@
 #include "linalg.h"
 #include "config.h"
 #include "game.h"
+#include "lua_api.h"
+#include "physics.h"
 
 static Camera2D camera = {0};
 
@@ -32,6 +34,8 @@ void client_render() {
 	BeginTextureMode(client_app.ui_target);
 	ClearBackground(BLANK);
 	// ui_render(&game.ui);
+	//
+	lua_callback(&game.lua, LUA_CALLBACK_CLIENT_UI);
 	EndTextureMode();
 
 	BeginTextureMode(client_app.render_target);
@@ -175,7 +179,9 @@ static inline void world_render() {
 	for (size_t i = 1; i < display->sprite_count; i++) {
 		SpriteId id = display->sorted[i];
 		Sprite* sprite = get_sprite(id);
-		if (!(sprite->flags & (SPRITE_FLAG_ALIVE | SPRITE_FLAG_ENABLED)))
+
+		static const SpriteFlag SHOULD_RENDER = SPRITE_FLAG_ALIVE | SPRITE_FLAG_ENABLED;
+		if ((sprite->flags & SHOULD_RENDER) != SHOULD_RENDER)
 			continue;
 
 		while (sprite->layer > layer) {

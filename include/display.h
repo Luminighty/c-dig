@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "linalg.h"
+#include "sprite_id.h"
 #include "texture_registry.h"
 
 #include <stdbool.h>
@@ -12,9 +13,6 @@
 #define SPRITE_MAX 1024
 #define SPRITE_SOCKET_MAX 8
 
-typedef uint32_t ZIndex;
-typedef uint32_t SpriteId;
-typedef uint32_t SpriteSocketKey;
 
 
 typedef enum {

@@ -7,6 +7,8 @@
 #include "component_storage.h"
 #include "components.h"
 #include "config.h"
+#include "darray.h"
+#include "entity_id.h"
 
 
 typedef struct {
@@ -20,14 +22,20 @@ typedef struct {
 } EntityContainer;
 
 
+struct world;
+typedef void EntityCallback(struct world *world, Entity entity);
+typedef DynamicArray(EntityCallback*) EntityCallbacks;
+
 typedef struct world {
 	EntityContainer entities;
 	ComponentContainer components;
+	EntityCallbacks on_destroys;
 } World;
 
 
 World *world_create();
 void world_print(World* world);
+void world_on_destroy(World *world, EntityCallback callback);
 
 Entity entity_create(World* world);
 void entity_destroy(World* world, Entity entity);

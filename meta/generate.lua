@@ -1,11 +1,11 @@
 function Build()
 	require("assets.all")
 
-	require("meta.math.generate")()
-	require("meta.components.generate")()
-	require("meta.textures.generate")()
-	require("meta.tiles.generate")()
-	require("meta.minerals.generate")()
+	require("meta.math")()
+	require("meta.components")()
+	require("meta.textures")()
+	require("meta.tiles")()
+	require("meta.minerals")()
 end
 
 Build()

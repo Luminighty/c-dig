@@ -21,7 +21,7 @@ function FunctionEnd()
 end
 
 function MathHeaderBegin(header_guard)
-	HeaderGuardStart(header_guard)
+	HeaderGuardStart(header_guard, "meta/math/generate.lua")
 	IS_HEADER = true
 end
 

@@ -2,6 +2,7 @@ require("meta.utils")
 require("meta.textures.registry")
 
 local HEADER_GUARD = "TEXTURE_REGISTRY"
+local _, MODULE_PATH = ...
 local header_file = "texture_registry.h"
 
 local function write_textures(generator, textures)
@@ -50,7 +51,7 @@ end
 
 local function generate_textures_header(textures)
 	io.output("./include/" .. header_file)
-	HeaderGuardStart(HEADER_GUARD)
+	HeaderGuardStart(HEADER_GUARD, MODULE_PATH)
 
 	io.write("#define REGISTRY_TEXTURES \\\n")
 	for _, texture in ipairs(textures) do

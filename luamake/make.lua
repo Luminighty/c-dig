@@ -8,7 +8,12 @@ print("    OS: ", OS)
 
 CC("gcc")
 Include("./include")
-Library("raylib", "pthread", "m", "dl")
+Library("m", "dl", "pthread") -- math, dynamic linking, threads
+Library("raylib")
+
+Include("./third_party/lua")
+Library("luajit-5.1")
+CFLAG("-Wl,-E") -- linux specific for lua ffi
 
 local os_libs = {
 	Windows = {"gdi32", "winmm"},
@@ -18,17 +23,19 @@ assert(os_libs[OS] ~= nil, "Unsupported OS \"" .. OS .. "\"")
 Library(os_libs[OS])
 
 
+CFLAG("-Wall", "-Wextra")
 if TARGET == "release" then
-	CFLAG("-O2", "-DNDEBUG")
+	CFLAG("-O3", "-DNDEBUG", "-flto")
+	CFLAG("-Werror")
 else
 	CFLAG("-g", "-O0")
-	CFLAG("-Wall", "-Wextra")
 	CFLAG("-DDEV_MODE")
 	CFLAG("-fsanitize=address")
 end
 
 MakeDir("bin")
 CopyRecursive("assets", "bin/")
+CopyRecursive("lua", "bin/")
 
 Exec("lua ./meta/generate.lua")
 
@@ -41,4 +48,5 @@ Link("./bin/main", core, client)
 
 print("[Linking Server]")
 Link("./bin/server", core, server)
+
 
