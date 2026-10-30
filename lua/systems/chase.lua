@@ -4,7 +4,7 @@ local Entity = require("cdef.Entity")
 local Component = require("cdef.Component")
 
 local query = Entity.query(Component.Position, Component.Chase)
-local SPEED = 10.0
+local SPEED = 0.5
 
 return function (world)
 	for entity in Entity.foreach(world, query) do
@@ -18,11 +18,8 @@ return function (world)
 
 		local pos = Vec2(position.x, position.y)
 		local target = Vec2(target_position.x, target_position.y)
-		local delta = target - pos
-		if math.abs(delta.x) > SPEED or math.abs(delta.y) > SPEED then
-			local move = delta:normalize():scale(SPEED)
-			position[0] = pos + move
-		end
+		local new_pos = pos:move_towards(target, SPEED)
+		position[0] = new_pos
 	    ::continue::
 	end
 end

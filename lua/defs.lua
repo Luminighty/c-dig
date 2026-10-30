@@ -3,3 +3,4 @@
 
 World = {}
 Game = {}
+Input = {}

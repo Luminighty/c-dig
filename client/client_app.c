@@ -35,7 +35,7 @@ void client_app_update() {
 
 void client_app_render() {
 	player_render(&game, &client_app.player);
-	lua_callback(&game.lua, LUA_CALLBACK_CLIENT_UI);
+	// lua_callback(&game.lua, LUA_CALLBACK_CLIENT_UI);
 }
 
 void client_app_destroy() {

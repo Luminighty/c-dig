@@ -1,3 +1,5 @@
+
+
 function Build()
 	require("assets.all")
 
@@ -6,6 +8,7 @@ function Build()
 	require("meta.textures")()
 	require("meta.tiles")()
 	require("meta.minerals")()
+	require("meta.ffi")()
 end
 
 Build()

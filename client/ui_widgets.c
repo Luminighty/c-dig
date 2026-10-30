@@ -29,10 +29,18 @@ bool ui_button_ex(Rect2i rectangle, const char* label, ButtonOptions options) {
 	ButtonState state = BUTTON_IDLE;
 	if (options.disabled) {
 		state = BUTTON_DISABLED;
-	} else if (CheckCollisionPointRec(to_rayvec(input.ui_mouse), to_rayrect(rectangle))) {
-		input.ui_hovering = true;
-		state = IsMouseButtonDown(0) ? BUTTON_PRESSED : BUTTON_HOVER;
-		result = IsMouseButtonReleased(0);
+	} else if (!options.skip_hitcheck) {
+		bool hovering = CheckCollisionPointRec(
+			to_rayvec(input.ui_mouse),
+			to_rayrect(rectangle)
+		);
+		if (hovering) {
+			state = IsMouseButtonDown(0) ? BUTTON_PRESSED : BUTTON_HOVER;
+			if (IsMouseButtonReleased(0)) {
+				result = true;
+				state = BUTTON_PRESSED;
+			}
+		}
 	}
 
 	NPatchInfo npatch = {
@@ -61,72 +69,105 @@ bool ui_button_ex(Rect2i rectangle, const char* label, ButtonOptions options) {
 
 UIContext window_context(Window *window) {
 	return ui_context((Vec2i){
-		.x = window->rectangle.x + 8,
-		.y = window->rectangle.y + 22,
+		.x = window->box.x + 8,
+		.y = window->box.y + 22,
 	});
 }
 
 
 WindowEvent ui_window(Window *window) {
+	WindowEvent result = WINDOW_EVENT_NONE;
 	static const NPatchInfo WINDOW_NPATCH = {
 		.source = { 0, 0, 42, 42 },
 		14, 14, 14, 14, NPATCH_NINE_PATCH
 	};
-	if (!window->visible) return WINDOW_EVENT_NONE;
-
 	Vec2i ui_mousei = {.x = input.ui_mouse.x, .y = input.ui_mouse.y};
 	if (window->dragged) {
-		window->rectangle.pos = vec2i_sub(ui_mousei, window->drag_offset);
+		window->box.pos = vec2i_sub(ui_mousei, window->drag_offset);
 		if (IsMouseButtonReleased(0))
 			window->dragged = false;
 	}
 	Rectangle close_button_rect = {
-		.x = window->rectangle.x + window->rectangle.w - 14,
-		.y = window->rectangle.y,
+		.x = window->box.x + window->box.w - 14,
+		.y = window->box.y,
 		.width = 14,
 		.height = 14,
 	};
 	Rectangle title_rectangle = {
-		.x = window->rectangle.x,
-		.y = window->rectangle.y,
-		.width = window->rectangle.w,
+		.x = window->box.x,
+		.y = window->box.y,
+		.width = window->box.w,
 		.height = 14,
 	};
+
+
+	enum {
+		WINDOW_CLOSE_IDLE,
+		WINDOW_CLOSE_HOVER,
+		WINDOW_CLOSE_HOLD,
+	} close_state = WINDOW_CLOSE_IDLE;
 	Vector2 mouse = to_rayvec(input.ui_mouse);
 	if (CheckCollisionPointRec(mouse, close_button_rect)) {
+		close_state = WINDOW_CLOSE_HOVER;
+		if (IsMouseButtonDown(0))
+			close_state = WINDOW_CLOSE_HOLD;
 		if (IsMouseButtonReleased(0))
-			window->visible = false;
+			result = WINDOW_EVENT_CLOSE;
 	} else if (CheckCollisionPointRec(mouse, title_rectangle)) {
 		if (IsMouseButtonPressed(0)) {
-			window->drag_offset = vec2i_sub(ui_mousei, window->rectangle.pos);
+			window->drag_offset = vec2i_sub(ui_mousei, window->box.pos);
 			window->dragged = true;
 		}
 	}
 
-	input.ui_hovering = CheckCollisionPointRec(mouse, to_rayrect(window->rectangle));
-
+	input.ui_hovering = CheckCollisionPointRec(mouse, to_rayrect(window->box));
 	DrawTextureNPatch(
 		assets_texture(TEXTURE_UI_WINDOW), WINDOW_NPATCH,
-		to_rayrect(window->rectangle), (Vector2){0, 0}, 0, WHITE
+		to_rayrect(window->box), (Vector2){0, 0}, 0, WHITE
+	);
+	static const Rectangle CLOSE_RECT_IDLE = {
+		.x = 42, .y = 0, .width = 14, .height = 14,
+	};
+	static const Rectangle CLOSE_RECT_HOVER = {
+		.x = 42, .y = 14, .width = 14, .height = 14,
+	};
+	static const Rectangle CLOSE_RECT_HOLD = {
+		.x = 42, .y = 28, .width = 14, .height = 14,
+	};
+	DrawTextureRec(
+		assets_texture(TEXTURE_UI_WINDOW),
+		close_state == WINDOW_CLOSE_IDLE ? CLOSE_RECT_IDLE :
+		close_state == WINDOW_CLOSE_HOVER ? CLOSE_RECT_HOVER :
+			CLOSE_RECT_HOLD,
+		(Vector2){ close_button_rect.x, close_button_rect.y },
+		WHITE
 	);
 	Vector2 title_position = (Vector2){
-		.x = window->rectangle.x + 4,
-		.y = window->rectangle.y + 1,
+		.x = window->box.x + 4,
+		.y = window->box.y + 1,
 	};
 	DrawTextEx(GetFontDefault(), window->title, title_position, FONTSIZE, 1, RAYWHITE);
-	return WINDOW_EVENT_NONE;
+	return result;
 }
 
 
-void ui_field(UIContext *context, const char *label, UIField value) {
-	DrawText(label, context->head.x, context->head.y, FONTSIZE, RAYWHITE);
+static const Color UI_COLORS[] = {
+	[UI_COLOR_BASE] = RAYWHITE,
+	[UI_COLOR_YELLOW] = YELLOW,
+	[UI_COLOR_GREEN] = GREEN,
+	[UI_COLOR_RED] = RED,
+	[UI_COLOR_BLUE] = BLUE,
+	[UI_COLOR_GRAY] = GRAY,
+};
+
+void ui_field(UIFieldProps props, const char *label, const char *value) {
+	DrawText(label, props.position.x, props.position.y, FONTSIZE, RAYWHITE);
 	DrawText(
-		value.text,
-		context->head.x + context->field_gap, 
-		context->head.y, 
-		FONTSIZE, value.color
+		value,
+		props.position.x + props.gap,
+		props.position.y,
+		FONTSIZE, UI_COLORS[props.color]
 	);
-	context->head.y += context->padding;
 }
 
 

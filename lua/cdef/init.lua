@@ -19,6 +19,12 @@ ffi.cdef[[
 	typedef struct world World;
 	typedef struct map Map;
 	typedef union entity Entity;
+	typedef struct game {
+		uint64_t tick;
+		World *world;
+		Map *map;
+	} Game;
+	extern Game game;
 	// extern Game game;
 ]]
 
@@ -27,5 +33,7 @@ require("cdef.Component")
 require("cdef.prefabs")
 require("cdef.Entity")
 require("cdef.map")
+require("cdef.ui_widgets")
+require("cdef.input")
 
 return ffi.C

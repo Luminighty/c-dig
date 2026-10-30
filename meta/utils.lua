@@ -106,4 +106,3 @@ function ReadHeaderIntoFFI(filename)
 		end
 	end
 end
-

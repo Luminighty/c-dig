@@ -20,10 +20,14 @@ void input_update() {
 	input.mouse_tile.x = mouse_tile.x;
 	input.mouse_tile.y = mouse_tile.y;
 
-	input.mouse_clicked = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
-	input.mouse_held = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+	input.mouse_clicked = false;
+	input.mouse_held    = false;
+	if (!input.ui_hovering) {
+		input.mouse_clicked = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
+		input.mouse_held    = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+		input.digging       = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+	}
 
-	input.digging = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
 	input.jump = IsKeyPressed(KEY_SPACE);
 	input.randomize_player = IsKeyPressed(KEY_R);
 

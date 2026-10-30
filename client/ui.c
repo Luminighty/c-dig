@@ -41,42 +41,42 @@ typedef struct {
 	int power;
 } DummySmelter;
 
-static Window smelter_window = {
-	.visible = true,
-	.title = "Dummy-D",
-	.rectangle = {.x = 100, .y = 100, .w = 120, .h = 100}
-};
-static Window bag_window = {
-	.visible = true,
-	.title = "Bag",
-	.rectangle = {.x = 250, .y = 100, .w = 240, .h = 50}
-};
-static DummySmelter smelter = { .enabled = false, .power = 100};
-static void dummy_windows();
+// static Window smelter_window = {
+// 	.visible = true,
+// 	.title = "Dummy-D",
+// 	.rectangle = {.x = 100, .y = 100, .w = 120, .h = 100}
+// };
+// static Window bag_window = {
+// 	.visible = true,
+// 	.title = "Bag",
+// 	.rectangle = {.x = 250, .y = 100, .w = 240, .h = 50}
+// };
+// static DummySmelter smelter = { .enabled = false, .power = 100};
+// static void dummy_windows();
 
 
 void ui_render(UI *ui) {
-	UNUSED(ui);
-	render_slots();
-	dummy_windows();
-	if (smelter.enabled && game.tick % 30 == 0)
-		smelter.power--;
+	// UNUSED(ui);
+	// render_slots();
+	// dummy_windows();
+	// if (smelter.enabled && game.tick % 30 == 0)
+	// 	smelter.power--;
 }
 
 
-static UIField smelter_power(DummySmelter *smelter) {
-	Color color = BLUE;
-	if (smelter->power < 100)
-		color = GREEN;
-	if (smelter->power < 50)
-		color = YELLOW;
-	if (smelter->power < 20)
-		color = RED;
-	return UIFIELD(
-		TextFormat("%d %%", smelter->power),
-		color
-	);
-}
+// static UIField smelter_power(DummySmelter *smelter) {
+// 	Color color = BLUE;
+// 	if (smelter->power < 100)
+// 		color = GREEN;
+// 	if (smelter->power < 50)
+// 		color = YELLOW;
+// 	if (smelter->power < 20)
+// 		color = RED;
+// 	return UIFIELD(
+// 		TextFormat("%d %%", smelter->power),
+// 		color
+// 	);
+// }
 
 
 // static UIField smelter_ore(DummySmelter *smelter) {
@@ -87,82 +87,82 @@ static UIField smelter_power(DummySmelter *smelter) {
 // }
 
 
-static UIField smelter_status(DummySmelter *smelter) {
-	if (smelter->power == 0)
-		return UIFIELD("No Power", GRAY);
-	if (smelter->enabled)
-		return UIFIELD("Online", GREEN);
-	return UIFIELD("Offline", RED);
-}
+// static UIField smelter_status(DummySmelter *smelter) {
+// 	if (smelter->power == 0)
+// 		return UIFIELD("No Power", GRAY);
+// 	if (smelter->enabled)
+// 		return UIFIELD("Online", GREEN);
+// 	return UIFIELD("Offline", RED);
+// }
 
 
-void smelter_ui(DummySmelter *smelter, Window *window) {
-	if (!window->visible)
-		return;
-	ui_window(window);
+// void smelter_ui(DummySmelter *smelter, Window *window) {
+// 	if (!window->visible)
+// 		return;
+// 	ui_window(window);
+//
+// 	UIContext ctx = window_context(window);
+//
+// 	ui_field(&ctx, "Status", smelter_status(smelter));
+// 	ui_field(&ctx, "Power", smelter_power(smelter));
+// 	// ui_field(&ctx, "Ore", smelter_ore(smelter));
+//
+// 	ctx.head.y += 8;
+//
+// 	bool start_pressed = ui_button(
+// 		((Rect2i){ .x = ctx.head.x, .y = ctx.head.y, .w = 48, .h = 18 }), "Start",
+// 		.variant = BUTTON_GREEN,
+// 		.disabled = smelter->enabled || smelter->power <= 0
+// 	);
+// 	bool stop_pressed = ui_button(
+// 		((Rect2i){ .x = ctx.head.x + 52, .y = ctx.head.y, .w = 48, .h = 18 }), "Stop",
+// 		.variant = BUTTON_RED,
+// 		.disabled = !smelter->enabled
+// 	);
+// 	if (start_pressed) smelter->enabled = true;
+// 	if (stop_pressed) smelter->enabled = false;
+// }
+//
+// static inline Color to_raylib_color(uint32_t color) {
+// 	return (Color) {
+// 		.r = (color & 0xFF0000) >> 16,
+// 		.g = (color & 0x00FF00) >> 8,
+// 		.b = (color & 0x0000FF) >> 0,
+// 		.a = 0xFF,
+// 	};
+// }
 
-	UIContext ctx = window_context(window);
-
-	ui_field(&ctx, "Status", smelter_status(smelter));
-	ui_field(&ctx, "Power", smelter_power(smelter));
-	// ui_field(&ctx, "Ore", smelter_ore(smelter));
-
-	ctx.head.y += 8;
-
-	bool start_pressed = ui_button(
-		((Rect2i){ .x = ctx.head.x, .y = ctx.head.y, .w = 48, .h = 18 }), "Start",
-		.variant = BUTTON_GREEN,
-		.disabled = smelter->enabled || smelter->power <= 0
-	);
-	bool stop_pressed = ui_button(
-		((Rect2i){ .x = ctx.head.x + 52, .y = ctx.head.y, .w = 48, .h = 18 }), "Stop",
-		.variant = BUTTON_RED,
-		.disabled = !smelter->enabled
-	);
-	if (start_pressed) smelter->enabled = true;
-	if (stop_pressed) smelter->enabled = false;
-}
-
-static inline Color to_raylib_color(uint32_t color) {
-	return (Color) {
-		.r = (color & 0xFF0000) >> 16,
-		.g = (color & 0x00FF00) >> 8,
-		.b = (color & 0x0000FF) >> 0,
-		.a = 0xFF,
-	};
-}
-
-void bag_ui(PlayerBag *bag, Window *window) {
-	if (!window->visible)
-		return;
-	ui_window(window);
-	UIContext context = window_context(window);
-
-	int width = window->rectangle.w - 16;
-	DrawRectangle(
-		context.head.x, context.head.y, 
-		width, 18,
-		GetColor(0x222222)
-	);
-	width -= 2;
-	int x = context.head.x + 1;
-	for (int i = 0; i < MINERAL__SIZE; i++) {
-		uint16_t amount = bag->amount[i];
-		float percentage = (float)amount / (float)bag->size;
-		int w = width * percentage;
-
-		DrawRectangle(
-			x, context.head.y + 1,
-			w, 16,
-			to_raylib_color(mineral_color(i))
-		);
-		x += w;
-	}
-}
+// void bag_ui(PlayerBag *bag, Window *window) {
+// 	if (!window->visible)
+// 		return;
+// 	ui_window(window);
+// 	UIContext context = window_context(window);
+//
+// 	int width = window->box.w - 16;
+// 	DrawRectangle(
+// 		context.head.x, context.head.y, 
+// 		width, 18,
+// 		GetColor(0x222222)
+// 	);
+// 	width -= 2;
+// 	int x = context.head.x + 1;
+// 	for (int i = 0; i < MINERAL__SIZE; i++) {
+// 		uint16_t amount = bag->amount[i];
+// 		float percentage = (float)amount / (float)bag->size;
+// 		int w = width * percentage;
+//
+// 		DrawRectangle(
+// 			x, context.head.y + 1,
+// 			w, 16,
+// 			to_raylib_color(mineral_color(i))
+// 		);
+// 		x += w;
+// 	}
+// }
 
 static void dummy_windows() {
-	smelter_ui(&smelter, &smelter_window);
-	bag_ui(&client_app.player.bag, &bag_window);
+	// smelter_ui(&smelter, &smelter_window);
+	// bag_ui(&client_app.player.bag, &bag_window);
 }
 //
 //

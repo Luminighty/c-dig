@@ -23,6 +23,16 @@ local mt = {
 				a.x * scale,
 				a.y * scale
 			)
+		end,
+		move_towards = function (from, target, max_distance)
+			local delta = target - from
+			local dist_sqr = max_distance * max_distance
+			if delta:lengthsqr() > dist_sqr then
+				local move = delta:normalize():scale(max_distance)
+				return from + move
+			else
+				return target
+			end
 		end
 	}
 }

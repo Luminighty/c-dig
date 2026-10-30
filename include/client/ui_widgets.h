@@ -25,9 +25,8 @@ typedef enum {
 } WindowEvent;
 
 typedef struct {
-	bool visible;
-	char *title;
-	Rect2i rectangle;
+	const char *title;
+	Rect2i box;
 	bool dragged;
 	Vec2i drag_offset;
 } Window;
@@ -57,6 +56,7 @@ typedef enum {
 typedef struct {
 	ButtonVariant variant;
 	bool disabled;
+	bool skip_hitcheck;
 	int label_offset_x;
 	int label_offset_y;
 } ButtonOptions;
@@ -69,14 +69,20 @@ bool ui_button_ex(Rect2i rectangle, const char* label, ButtonOptions options);
 // //////////////// FIELD /////////////////
 // ////////////////////////////////////////
 
+typedef enum {
+	UI_COLOR_BASE,
+	UI_COLOR_YELLOW,
+	UI_COLOR_GREEN,
+	UI_COLOR_RED,
+	UI_COLOR_BLUE,
+	UI_COLOR_GRAY,
+} UiColor;
 typedef struct {
-	const char *text;
-	// NOTE: At some point, try to use our own Color struct, and not raylibs!
-	Color color;
-} UIField;
-#define UIFIELD(text, color) ((UIField){text, color})
-
-void ui_field(UIContext *context, const char *label, UIField value);
+	Vec2i position;
+	UiColor color;
+	int gap;
+} UIFieldProps;
+void ui_field(UIFieldProps props, const char *label, const char *value);
 
 // ////////////////////////////////////////
 // //////////////// SLOT //////////////////
